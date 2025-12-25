@@ -7,10 +7,14 @@ import 'package:intl/intl.dart';
 import 'package:expense_tracker/page/login/bloc/login_event.dart';
 import 'package:expense_tracker/page/login/bloc/login_state.dart';
 import 'package:expense_tracker/models/user.dart' as myuser;
+import 'package:expense_tracker/firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   String _status = "";
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId: DefaultFirebaseOptions.currentPlatform.iosClientId,
+  );
 
   LoginBloc() : super(InitState()) {
     on<LoginWithEmailPasswordEvent>((event, emit) async {
@@ -55,14 +59,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   Future<UserCredential?> signInWithGoogle() async {
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
     if (googleUser != null) {
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
@@ -77,7 +80,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     if (loginResult.accessToken != null) {
       final OAuthCredential facebookAuthCredential =
-          FacebookAuthProvider.credential(loginResult.accessToken!.token);
+          FacebookAuthProvider.credential(
+              loginResult.accessToken!.tokenString);
       await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
       return true;
     }

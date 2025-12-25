@@ -16,7 +16,11 @@ class InputMoney extends StatelessWidget {
         controller: controller,
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp("[\\s0-9a-zA-Z]")),
-          CurrencyTextInputFormatter(locale: "vi")
+          CurrencyTextInputFormatter.currency(
+            locale: "vi",
+            symbol: "",
+            decimalDigits: 0,
+          )
         ],
         textAlign: TextAlign.right,
         style: const TextStyle(fontSize: 20),

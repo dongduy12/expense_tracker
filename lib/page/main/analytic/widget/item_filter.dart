@@ -51,7 +51,8 @@ class ItemFilter extends StatelessWidget {
                     ),
                   )),
                   underline: const SizedBox.shrink(),
-                  icon: const SizedBox.shrink(),
+                  iconStyleData:
+                      const IconStyleData(icon: SizedBox.shrink()),
                   isExpanded: true,
                   // value: value,
                   items: list.map((e) {

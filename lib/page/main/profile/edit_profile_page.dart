@@ -100,7 +100,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                     RegExp("[\\s0-9a-zA-Z]")),
-                                CurrencyTextInputFormatter(locale: "vi")
+                                CurrencyTextInputFormatter.currency(
+                                  locale: "vi",
+                                  symbol: "",
+                                  decimalDigits: 0,
+                                )
                               ],
                             ),
                             const SizedBox(height: 30),
@@ -341,7 +345,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final cropImage = await ImageCropper().cropImage(
         sourcePath: chooseImage.path,
         aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-        aspectRatioPresets: [CropAspectRatioPreset.square],
       );
       if (cropImage == null) return null;
       return File(cropImage.path);
