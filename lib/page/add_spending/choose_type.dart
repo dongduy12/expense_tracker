@@ -42,7 +42,12 @@ class _ChooseTypeState extends State<ChooseType> with TickerProviderStateMixin {
         centerTitle: true,
         title: DropdownButtonHideUnderline(
           child: DropdownButton2(
-            dropdownMaxHeight: 200,
+            dropdownStyleData: DropdownStyleData(
+              maxHeight: 200,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
             customButton: SizedBox(
               width: 140,
               child: Row(
@@ -58,9 +63,6 @@ class _ChooseTypeState extends State<ChooseType> with TickerProviderStateMixin {
                   const Icon(Icons.arrow_drop_down)
                 ],
               ),
-            ),
-            dropdownDecoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
             ),
             items: title
                 .map(
@@ -82,9 +84,13 @@ class _ChooseTypeState extends State<ChooseType> with TickerProviderStateMixin {
                 selectedValue = value as String;
               });
             },
-            buttonHeight: 40,
-            buttonWidth: 140,
-            itemHeight: 40,
+            buttonStyleData: const ButtonStyleData(
+              height: 40,
+              width: 140,
+            ),
+            menuItemStyleData: const MenuItemStyleData(
+              height: 40,
+            ),
           ),
         ),
         bottom: PreferredSize(

@@ -74,7 +74,7 @@ class _ViewSpendingPageState extends State<ViewSpendingPage> {
                       await File('${directory.path}/image.png').create();
                   await imagePath.writeAsBytes(image);
 
-                  await Share.shareFiles([imagePath.path]);
+                  await Share.shareXFiles([XFile(imagePath.path)]);
                 }
               });
             },

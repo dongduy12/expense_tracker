@@ -329,7 +329,11 @@ class _FilterPageState extends State<FilterPage> {
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(
                           RegExp("[\\s0-9a-zA-Z]")),
-                      CurrencyTextInputFormatter(locale: "vi"),
+                      CurrencyTextInputFormatter.currency(
+                        locale: "vi",
+                        symbol: "",
+                        decimalDigits: 0,
+                      ),
                     ],
                     decoration: const InputDecoration(
                       hintText: '30.000 VND',
@@ -350,7 +354,11 @@ class _FilterPageState extends State<FilterPage> {
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
                             RegExp("[\\s0-9a-zA-Z]")),
-                        CurrencyTextInputFormatter(locale: "vi"),
+                        CurrencyTextInputFormatter.currency(
+                          locale: "vi",
+                          symbol: "",
+                          decimalDigits: 0,
+                        ),
                       ],
                       decoration: const InputDecoration(
                         hintText: '30.000 VND',

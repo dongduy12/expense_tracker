@@ -110,7 +110,7 @@ class ColumnChartState extends State<ColumnChart> {
       maxY: max,
       barTouchData: BarTouchData(
         touchTooltipData: BarTouchTooltipData(
-            tooltipBgColor: Colors.blueGrey,
+            tooltipBackgroundColor: Colors.blueGrey,
             getTooltipItem: (group, groupIndex, rod, rodIndex) {
               String weekDay = "";
               if (widget.index == 0) {
@@ -186,7 +186,7 @@ class ColumnChartState extends State<ColumnChart> {
       fontSize: 14,
     );
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      meta: meta,
       space: 0,
       child: Text("${(value / 1000).toStringAsFixed(0)}K", style: style),
     );
@@ -210,6 +210,6 @@ class ColumnChartState extends State<ColumnChart> {
     }
 
     Widget text = Text(title, style: style);
-    return SideTitleWidget(axisSide: meta.axisSide, space: 16, child: text);
+    return SideTitleWidget(meta: meta, space: 16, child: text);
   }
 }

@@ -100,16 +100,18 @@ class _CurrencyExchangeRateState extends State<CurrencyExchangeRate> {
                   width: 70,
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton2(
-                      dropdownMaxHeight: 200,
+                      dropdownStyleData: DropdownStyleData(
+                        maxHeight: 200,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                       hint: Text(
                         'VND',
                         style: TextStyle(
                           fontSize: 16,
                           color: Theme.of(context).hintColor,
                         ),
-                      ),
-                      dropdownDecoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
                       ),
                       items: currency.entries
                           .map(
@@ -128,9 +130,13 @@ class _CurrencyExchangeRateState extends State<CurrencyExchangeRate> {
                           selectedValue = value as String;
                         });
                       },
-                      buttonHeight: 40,
-                      buttonWidth: 140,
-                      itemHeight: 40,
+                      buttonStyleData: const ButtonStyleData(
+                        height: 40,
+                        width: 140,
+                      ),
+                      menuItemStyleData: const MenuItemStyleData(
+                        height: 40,
+                      ),
                     ),
                   ),
                 ),

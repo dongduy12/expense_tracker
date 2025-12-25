@@ -72,8 +72,9 @@ class MyApp extends StatelessWidget {
                       brightness: Brightness.light,
                       primarySwatch: Colors.blue,
                       scaffoldBackgroundColor: AppColors.whisperBackground,
-                      bottomAppBarTheme:
-                          BottomAppBarTheme(color: AppColors.whisperBackground),
+                      bottomAppBarTheme: BottomAppBarThemeData(
+                        color: AppColors.whisperBackground,
+                      ),
                       floatingActionButtonTheme:
                           const FloatingActionButtonThemeData(
                         backgroundColor: Color.fromRGBO(121, 158, 84, 1),

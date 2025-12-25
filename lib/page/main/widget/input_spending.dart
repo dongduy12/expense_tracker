@@ -158,7 +158,13 @@ class _InputSpendingState extends State<InputSpending> {
                   child: TextFormField(
                     controller: _moneyController,
                     keyboardType: TextInputType.number,
-                    inputFormatters: [CurrencyTextInputFormatter(locale: "vi")],
+                    inputFormatters: [
+                      CurrencyTextInputFormatter.currency(
+                        locale: "vi",
+                        symbol: "",
+                        decimalDigits: 0,
+                      )
+                    ],
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return AppLocalizations.of(context)

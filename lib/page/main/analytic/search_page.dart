@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' hide Filter;
 import 'package:expense_tracker/constants/function/extension.dart';
 import 'package:expense_tracker/constants/function/route_function.dart';
 import 'package:expense_tracker/constants/list.dart';
