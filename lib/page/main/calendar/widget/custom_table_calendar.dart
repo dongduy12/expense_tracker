@@ -1,6 +1,6 @@
-import 'package:spending_management/models/spending.dart';
-import 'package:spending_management/setting/bloc/setting_cubit.dart';
-import 'package:spending_management/setting/bloc/setting_state.dart';
+import 'package:expense_tracker/models/spending.dart';
+import 'package:expense_tracker/setting/bloc/setting_cubit.dart';
+import 'package:expense_tracker/setting/bloc/setting_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';

@@ -1,11 +1,11 @@
 import 'dart:io';
-import 'package:spending_management/constants/function/get_data_spending.dart';
-import 'package:spending_management/models/spending.dart';
+import 'package:expense_tracker/constants/function/get_data_spending.dart';
+import 'package:expense_tracker/models/spending.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
-import 'package:spending_management/models/user.dart' as myuser;
+import 'package:expense_tracker/models/user.dart' as myuser;
 
 class SpendingFirebase {
   static Future addSpending(Spending spending) async {

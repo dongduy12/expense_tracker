@@ -1,22 +1,22 @@
-import 'package:spending_management/constants/function/loading_animation.dart';
-import 'package:spending_management/constants/function/route_function.dart';
-import 'package:spending_management/page/forgot/forgot_page.dart';
-import 'package:spending_management/page/signup/signup_page.dart';
-import 'package:spending_management/setting/localization/app_localizations.dart';
+import 'package:expense_tracker/constants/function/loading_animation.dart';
+import 'package:expense_tracker/constants/function/route_function.dart';
+import 'package:expense_tracker/page/forgot/forgot_page.dart';
+import 'package:expense_tracker/page/signup/signup_page.dart';
+import 'package:expense_tracker/setting/localization/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:spending_management/constants/app_styles.dart';
-import 'package:spending_management/page/login/bloc/login_bloc.dart';
-import 'package:spending_management/page/login/bloc/login_event.dart';
-import 'package:spending_management/page/login/bloc/login_state.dart';
-import 'package:spending_management/page/login/widget/custom_button.dart';
-import 'package:spending_management/page/login/widget/input_password.dart';
-import 'package:spending_management/page/login/widget/input_text.dart';
-import 'package:spending_management/page/login/widget/text_continue.dart';
+import 'package:expense_tracker/constants/app_styles.dart';
+import 'package:expense_tracker/page/login/bloc/login_bloc.dart';
+import 'package:expense_tracker/page/login/bloc/login_event.dart';
+import 'package:expense_tracker/page/login/bloc/login_state.dart';
+import 'package:expense_tracker/page/login/widget/custom_button.dart';
+import 'package:expense_tracker/page/login/widget/input_password.dart';
+import 'package:expense_tracker/page/login/widget/input_text.dart';
+import 'package:expense_tracker/page/login/widget/text_continue.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);

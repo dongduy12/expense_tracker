@@ -1,6 +1,6 @@
-import 'package:spending_management/page/login/widget/custom_button.dart';
-import 'package:spending_management/page/login/widget/input_text.dart';
-import 'package:spending_management/setting/localization/app_localizations.dart';
+import 'package:expense_tracker/page/login/widget/custom_button.dart';
+import 'package:expense_tracker/page/login/widget/input_text.dart';
+import 'package:expense_tracker/setting/localization/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 

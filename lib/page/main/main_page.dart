@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:spending_management/constants/function/on_will_pop.dart';
-import 'package:spending_management/constants/function/route_function.dart';
-import 'package:spending_management/page/add_spending/add_spending.dart';
-import 'package:spending_management/page/main/analytic/analytic_page.dart';
-import 'package:spending_management/page/main/calendar/calendar_page.dart';
-import 'package:spending_management/page/main/home/home_page.dart';
-import 'package:spending_management/page/main/profile/profile_page.dart';
-import 'package:spending_management/page/main/widget/item_bottom_tab.dart';
+import 'package:expense_tracker/constants/function/on_will_pop.dart';
+import 'package:expense_tracker/constants/function/route_function.dart';
+import 'package:expense_tracker/page/add_spending/add_spending.dart';
+import 'package:expense_tracker/page/main/analytic/analytic_page.dart';
+import 'package:expense_tracker/page/main/calendar/calendar_page.dart';
+import 'package:expense_tracker/page/main/home/home_page.dart';
+import 'package:expense_tracker/page/main/profile/profile_page.dart';
+import 'package:expense_tracker/page/main/widget/item_bottom_tab.dart';
 
 import '../../setting/localization/app_localizations.dart';
 

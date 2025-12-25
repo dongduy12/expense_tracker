@@ -3,9 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/cli_commands.dart';
 import 'package:intl/intl.dart';
-import 'package:spending_management/models/spending.dart';
-import 'package:spending_management/page/main/home/widget/item_spending_widget.dart';
-import 'package:spending_management/page/main/home/widget/summary_spending.dart';
+import 'package:expense_tracker/models/spending.dart';
+import 'package:expense_tracker/page/main/home/widget/item_spending_widget.dart';
+import 'package:expense_tracker/page/main/home/widget/summary_spending.dart';
 
 import '../../../constants/app_styles.dart';
 import '../../../setting/localization/app_localizations.dart';

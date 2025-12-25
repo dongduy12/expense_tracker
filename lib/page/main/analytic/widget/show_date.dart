@@ -1,4 +1,4 @@
-import 'package:spending_management/constants/function/get_date.dart';
+import 'package:expense_tracker/constants/function/get_date.dart';
 import 'package:flutter/material.dart';
 
 Widget showDate({

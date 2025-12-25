@@ -1,6 +1,6 @@
-import 'package:spending_management/setting/localization/app_localizations.dart';
+import 'package:expense_tracker/setting/localization/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:spending_management/constants/app_styles.dart';
+import 'package:expense_tracker/constants/app_styles.dart';
 
 class TextContinue extends StatelessWidget {
   const TextContinue({Key? key}) : super(key: key);

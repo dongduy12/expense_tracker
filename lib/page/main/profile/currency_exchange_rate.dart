@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:html/dom.dart' as html_parser;
 import 'package:shimmer/shimmer.dart';
-import 'package:spending_management/constants/function/extension.dart';
+import 'package:expense_tracker/constants/function/extension.dart';
 
 import '../../../models/api_service.dart';
 import '../../../setting/localization/app_localizations.dart';

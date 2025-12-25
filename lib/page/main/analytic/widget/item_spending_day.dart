@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:spending_management/constants/function/list_categories.dart';
-import 'package:spending_management/models/spending.dart';
-import 'package:spending_management/setting/localization/app_localizations.dart';
+import 'package:expense_tracker/constants/function/list_categories.dart';
+import 'package:expense_tracker/models/spending.dart';
+import 'package:expense_tracker/setting/localization/app_localizations.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class ItemSpendingDay extends StatefulWidget {

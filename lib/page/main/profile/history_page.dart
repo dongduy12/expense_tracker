@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:spending_management/page/main/home/widget/item_spending_day.dart';
-import 'package:spending_management/page/main/home/widget/item_spending_widget.dart';
+import 'package:expense_tracker/page/main/home/widget/item_spending_day.dart';
+import 'package:expense_tracker/page/main/home/widget/item_spending_widget.dart';
 
 import '../../../controls/spending_firebase.dart';
 import '../../../models/spending.dart';

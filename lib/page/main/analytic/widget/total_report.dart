@@ -1,6 +1,6 @@
-import 'package:spending_management/models/spending.dart';
-import 'package:spending_management/page/main/analytic/widget/box_text.dart';
-import 'package:spending_management/setting/localization/app_localizations.dart';
+import 'package:expense_tracker/models/spending.dart';
+import 'package:expense_tracker/page/main/analytic/widget/box_text.dart';
+import 'package:expense_tracker/setting/localization/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class TotalReport extends StatelessWidget {

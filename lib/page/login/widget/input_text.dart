@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:spending_management/constants/app_styles.dart';
-import 'package:spending_management/setting/localization/app_localizations.dart';
+import 'package:expense_tracker/constants/app_styles.dart';
+import 'package:expense_tracker/setting/localization/app_localizations.dart';
 
 class InputText extends StatelessWidget {
   const InputText({

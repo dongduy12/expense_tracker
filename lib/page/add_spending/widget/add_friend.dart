@@ -1,8 +1,8 @@
-import 'package:spending_management/constants/function/route_function.dart';
-import 'package:spending_management/page/add_spending/add_friend_page.dart';
-import 'package:spending_management/page/add_spending/widget/circle_text.dart';
-import 'package:spending_management/page/add_spending/widget/remove_icon.dart';
-import 'package:spending_management/setting/localization/app_localizations.dart';
+import 'package:expense_tracker/constants/function/route_function.dart';
+import 'package:expense_tracker/page/add_spending/add_friend_page.dart';
+import 'package:expense_tracker/page/add_spending/widget/circle_text.dart';
+import 'package:expense_tracker/page/add_spending/widget/remove_icon.dart';
+import 'package:expense_tracker/setting/localization/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class AddFriend extends StatelessWidget {

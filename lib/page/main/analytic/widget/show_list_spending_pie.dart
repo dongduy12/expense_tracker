@@ -1,8 +1,8 @@
-import 'package:spending_management/constants/function/route_function.dart';
-import 'package:spending_management/constants/list.dart';
-import 'package:spending_management/models/spending.dart';
-import 'package:spending_management/page/main/home/view_list_spending_page.dart';
-import 'package:spending_management/setting/localization/app_localizations.dart';
+import 'package:expense_tracker/constants/function/route_function.dart';
+import 'package:expense_tracker/constants/list.dart';
+import 'package:expense_tracker/models/spending.dart';
+import 'package:expense_tracker/page/main/home/view_list_spending_page.dart';
+import 'package:expense_tracker/setting/localization/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 

@@ -1,5 +1,5 @@
-import 'package:spending_management/constants/function/get_data_spending.dart';
-import 'package:spending_management/models/spending.dart';
+import 'package:expense_tracker/constants/function/get_data_spending.dart';
+import 'package:expense_tracker/models/spending.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 

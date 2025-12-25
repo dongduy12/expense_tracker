@@ -1,4 +1,4 @@
-import 'package:spending_management/models/user.dart';
+import 'package:expense_tracker/models/user.dart';
 
 abstract class SignupEvent {}
 

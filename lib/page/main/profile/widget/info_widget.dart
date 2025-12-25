@@ -3,7 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:spending_management/constants/function/extension.dart';
+import 'package:expense_tracker/constants/function/extension.dart';
 
 import '../../../../models/user.dart';
 import '../../../../setting/localization/app_localizations.dart';

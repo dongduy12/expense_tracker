@@ -1,8 +1,8 @@
-import 'package:spending_management/constants/function/on_will_pop.dart';
+import 'package:expense_tracker/constants/function/on_will_pop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:spending_management/page/signup/bloc/signup_bloc.dart';
-import 'package:spending_management/page/signup/signup_form.dart';
+import 'package:expense_tracker/page/signup/bloc/signup_bloc.dart';
+import 'package:expense_tracker/page/signup/signup_form.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({Key? key}) : super(key: key);

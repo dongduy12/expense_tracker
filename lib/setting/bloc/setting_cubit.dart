@@ -1,7 +1,7 @@
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart' show Locale;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:spending_management/setting/bloc/setting_state.dart';
+import 'package:expense_tracker/setting/bloc/setting_state.dart';
 
 class SettingCubit extends Cubit<SettingState> {
   int? language;

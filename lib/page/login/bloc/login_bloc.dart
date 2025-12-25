@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
-import 'package:spending_management/page/login/bloc/login_event.dart';
-import 'package:spending_management/page/login/bloc/login_state.dart';
-import 'package:spending_management/models/user.dart' as myuser;
+import 'package:expense_tracker/page/login/bloc/login_event.dart';
+import 'package:expense_tracker/page/login/bloc/login_state.dart';
+import 'package:expense_tracker/models/user.dart' as myuser;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {

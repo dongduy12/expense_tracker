@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:spending_management/constants/function/find_index.dart';
-import 'package:spending_management/controls/spending_firebase.dart';
-import 'package:spending_management/models/spending.dart';
-import 'package:spending_management/page/main/calendar/widget/build_spending.dart';
-import 'package:spending_management/page/main/calendar/widget/custom_table_calendar.dart';
-import 'package:spending_management/page/main/calendar/widget/total_spending.dart';
+import 'package:expense_tracker/constants/function/find_index.dart';
+import 'package:expense_tracker/controls/spending_firebase.dart';
+import 'package:expense_tracker/models/spending.dart';
+import 'package:expense_tracker/page/main/calendar/widget/build_spending.dart';
+import 'package:expense_tracker/page/main/calendar/widget/custom_table_calendar.dart';
+import 'package:expense_tracker/page/main/calendar/widget/total_spending.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';

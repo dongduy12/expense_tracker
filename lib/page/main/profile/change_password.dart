@@ -2,7 +2,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:spending_management/page/main/profile/new_password.dart';
+import 'package:expense_tracker/page/main/profile/new_password.dart';
 
 import '../../../constants/function/route_function.dart';
 import '../../../setting/localization/app_localizations.dart';

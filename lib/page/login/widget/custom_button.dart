@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:spending_management/constants/app_colors.dart';
-import 'package:spending_management/constants/app_styles.dart';
+import 'package:expense_tracker/constants/app_colors.dart';
+import 'package:expense_tracker/constants/app_styles.dart';
 
 Widget customButton({required String text, required Function action}) {
   return SizedBox(

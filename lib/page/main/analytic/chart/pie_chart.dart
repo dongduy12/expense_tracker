@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'package:spending_management/constants/list.dart';
-import 'package:spending_management/models/spending.dart';
+import 'package:expense_tracker/constants/list.dart';
+import 'package:expense_tracker/models/spending.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 

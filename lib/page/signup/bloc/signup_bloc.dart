@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:spending_management/page/signup/bloc/signup_event.dart';
-import 'package:spending_management/page/signup/bloc/singup_state.dart';
-import 'package:spending_management/models/user.dart' as myuser;
+import 'package:expense_tracker/page/signup/bloc/signup_event.dart';
+import 'package:expense_tracker/page/signup/bloc/singup_state.dart';
+import 'package:expense_tracker/models/user.dart' as myuser;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupBloc extends Bloc<SignupEvent, SignupState> {

@@ -1,13 +1,13 @@
 import 'dart:async';
-import 'package:spending_management/constants/function/on_will_pop.dart';
-import 'package:spending_management/constants/function/route_function.dart';
-import 'package:spending_management/page/signup/verify/input_wallet.dart';
-import 'package:spending_management/setting/localization/app_localizations.dart';
+import 'package:expense_tracker/constants/function/on_will_pop.dart';
+import 'package:expense_tracker/constants/function/route_function.dart';
+import 'package:expense_tracker/page/signup/verify/input_wallet.dart';
+import 'package:expense_tracker/setting/localization/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:spending_management/constants/app_colors.dart';
-import 'package:spending_management/constants/app_styles.dart';
+import 'package:expense_tracker/constants/app_colors.dart';
+import 'package:expense_tracker/constants/app_styles.dart';
 
 class VerifyPage extends StatefulWidget {
   const VerifyPage({Key? key}) : super(key: key);

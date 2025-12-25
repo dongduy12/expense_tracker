@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart' show Locale, LocalizationsDelegate;
-import 'package:spending_management/setting/localization/app_localizations.dart';
+import 'package:expense_tracker/setting/localization/app_localizations.dart';
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const AppLocalizationsDelegate();
