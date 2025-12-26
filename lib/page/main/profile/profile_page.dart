@@ -8,7 +8,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:expense_tracker/firebase_options.dart';
 import 'package:expense_tracker/page/main/profile/about_page.dart';
 import 'package:expense_tracker/page/main/profile/change_password.dart';
@@ -215,14 +215,12 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           onPressed: () async {
                             await FirebaseAuth.instance.signOut();
-                            await GoogleSignInPlatform.instance.initWithParams(
-                              SignInInitParameters(
-                                clientId: DefaultFirebaseOptions
-                                    .currentPlatform.iosClientId,
-                                scopes: const <String>['email'],
-                              ),
+                            final googleSignIn = GoogleSignIn(
+                              clientId: DefaultFirebaseOptions
+                                  .currentPlatform.iosClientId,
+                              scopes: const <String>['email'],
                             );
-                            await GoogleSignInPlatform.instance.signOut();
+                            await googleSignIn.signOut();
                             await FacebookAuth.instance.logOut();
                             if (!mounted) return;
                             Navigator.pushNamedAndRemoveUntil(

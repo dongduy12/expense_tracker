@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:expense_tracker/page/login/bloc/login_event.dart';
 import 'package:expense_tracker/page/login/bloc/login_state.dart';
@@ -12,8 +12,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   String _status = "";
-  final GoogleSignInPlatform _googleSignInPlatform =
-      GoogleSignInPlatform.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId: DefaultFirebaseOptions.currentPlatform.iosClientId,
+    scopes: const <String>['email'],
+  );
 
   LoginBloc() : super(InitState()) {
     on<LoginWithEmailPasswordEvent>((event, emit) async {
@@ -58,18 +60,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   Future<UserCredential?> signInWithGoogle() async {
-    await _googleSignInPlatform.initWithParams(
-      SignInInitParameters(
-        clientId: DefaultFirebaseOptions.currentPlatform.iosClientId,
-        scopes: const <String>['email'],
-      ),
-    );
-    final GoogleSignInUserData? googleUser =
-        await _googleSignInPlatform.signIn();
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
     if (googleUser != null) {
-      final GoogleSignInTokenData googleAuth =
-          await _googleSignInPlatform.getTokens(email: googleUser.email);
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
