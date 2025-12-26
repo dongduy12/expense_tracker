@@ -2,18 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart';
+import 'package:google_sign_in/google_sign_in.dart'; // Import đúng
 import 'package:intl/intl.dart';
 import 'package:expense_tracker/page/login/bloc/login_event.dart';
 import 'package:expense_tracker/page/login/bloc/login_state.dart';
 import 'package:expense_tracker/models/user.dart' as myuser;
-import 'package:expense_tracker/firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   String _status = "";
-  final GoogleSignInPlatform _googleSignInPlatform =
-      GoogleSignInPlatform.instance;
+
+  // XÓA dòng khai báo biến _googleSignIn cũ đi
+  // final GoogleSignIn _googleSignIn = ... (Xóa dòng này)
 
   LoginBloc() : super(InitState()) {
     on<LoginWithEmailPasswordEvent>((event, emit) async {
@@ -58,28 +58,34 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   Future<UserCredential?> signInWithGoogle() async {
-    await _googleSignInPlatform.initWithParams(
-      SignInInitParameters(
-        clientId: DefaultFirebaseOptions.currentPlatform.iosClientId,
-        scopes: const <String>['email'],
-      ),
-    );
-    final GoogleSignInUserData? googleUser =
-        await _googleSignInPlatform.signIn();
-
-    if (googleUser != null) {
-      final GoogleSignInTokenData googleAuth =
-          await _googleSignInPlatform.getTokens(email: googleUser.email);
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
+    try {
+      // CODE MỚI: Dùng authenticate() thay vì signIn()
+      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance.authenticate(
+        scopeHint: ['email'], // Truyền scope tại đây
       );
 
-      return await FirebaseAuth.instance.signInWithCredential(credential);
-    }
+      if (googleUser != null) {
+        // 2. Lấy thông tin xác thực (chỉ còn idToken)
+        final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
 
-    return null;
+        // 3. Tạo credential cho Firebase
+        // LƯU Ý: Phiên bản mới không cần accessToken nữa, chỉ cần idToken
+        final credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+          accessToken: null, // Truyền null vào đây
+        );
+
+        // 4. Đăng nhập vào Firebase
+        return await FirebaseAuth.instance.signInWithCredential(credential);
+      }
+
+    } catch (e) {
+      // authenticate() sẽ ném lỗi nếu người dùng hủy đăng nhập, ta bắt lỗi tại đây
+      _status = e.toString();
+      print("Google Sign In Error: $_status");
+      return null;
+    }
   }
 
   Future<bool> signInWithFacebook() async {
@@ -87,8 +93,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     if (loginResult.accessToken != null) {
       final OAuthCredential facebookAuthCredential =
-          FacebookAuthProvider.credential(
-              loginResult.accessToken!.tokenString);
+      FacebookAuthProvider.credential(
+          loginResult.accessToken!.tokenString);
       await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
       return true;
     }
@@ -116,10 +122,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     await firestore.get().then((value) async {
       if (!value.exists) {
         await firestore.set(myuser.User(
-                name: FirebaseAuth.instance.currentUser!.displayName.toString(),
-                birthday: DateFormat("dd/MM/yyyy").format(DateTime.now()),
-                money: 0,
-                avatar: FirebaseAuth.instance.currentUser!.photoURL.toString())
+            name: FirebaseAuth.instance.currentUser!.displayName.toString(),
+            birthday: DateFormat("dd/MM/yyyy").format(DateTime.now()),
+            money: 0,
+            avatar: FirebaseAuth.instance.currentUser!.photoURL.toString())
             .toMap());
         check = false;
       }
