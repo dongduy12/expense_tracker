@@ -110,7 +110,6 @@ class ColumnChartState extends State<ColumnChart> {
       maxY: max,
       barTouchData: BarTouchData(
         touchTooltipData: BarTouchTooltipData(
-            tooltipBgColor: Colors.blueGrey,
             getTooltipItem: (group, groupIndex, rod, rodIndex) {
               String weekDay = "";
               if (widget.index == 0) {
