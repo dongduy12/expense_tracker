@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/cli_commands.dart';
 import 'package:intl/intl.dart';
 import 'package:expense_tracker/constants/function/extension.dart';
 import 'package:expense_tracker/models/spending.dart';
