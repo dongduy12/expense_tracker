@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -40,17 +41,32 @@ class InfoWidget extends StatelessWidget {
         const SizedBox(height: 10),
         ClipOval(
           child: user != null
-              ? CachedNetworkImage(
-                  imageUrl: user!.avatar,
-                  width: 150,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => loadingInfo(
-                    width: 150,
-                    height: 150,
-                    radius: 90,
-                  ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                )
+              ? (user!.avatar.startsWith('http')
+                  ? CachedNetworkImage(
+                      imageUrl: user!.avatar,
+                      width: 150,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => loadingInfo(
+                        width: 150,
+                        height: 150,
+                        radius: 90,
+                      ),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                    )
+                  : (user!.avatar.startsWith('assets/')
+                      ? Image.asset(
+                          user!.avatar,
+                          width: 150,
+                          height: 150,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.file(
+                          File(user!.avatar),
+                          width: 150,
+                          height: 150,
+                          fit: BoxFit.cover,
+                        )))
               : loadingInfo(width: 150, height: 150, radius: 90),
         ),
         const SizedBox(height: 20),

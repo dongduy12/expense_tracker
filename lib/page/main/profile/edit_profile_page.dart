@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -44,13 +42,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         centerTitle: true,
       ),
       body: FutureBuilder(
-        future: FirebaseFirestore.instance
-            .collection("info")
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .get(),
+        future: SpendingFirebase.getUser(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            myuser.User user = myuser.User.fromFirebase(snapshot.requireData);
+            myuser.User user = snapshot.requireData;
             final nameController = TextEditingController(text: user.name);
             final moneyController = TextEditingController(
               text: NumberFormat.currency(locale: "vi_VI").format(user.money),
@@ -236,16 +231,29 @@ class _EditProfilePageState extends State<EditProfilePage> {
         children: [
           ClipOval(
             child: image == null
-                ? CachedNetworkImage(
-                    imageUrl: url,
-                    width: 170,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) {
-                      return loadingInfo(width: 150, height: 150, radius: 90);
-                    },
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                  )
+                ? (url.startsWith('http')
+                    ? CachedNetworkImage(
+                        imageUrl: url,
+                        width: 170,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) {
+                          return loadingInfo(
+                              width: 150, height: 150, radius: 90);
+                        },
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                      )
+                    : (url.startsWith('assets/')
+                        ? Image.asset(
+                            url,
+                            width: 170,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.file(
+                            File(url),
+                            width: 170,
+                            fit: BoxFit.cover,
+                          )))
                 : Image.file(image, width: 170),
           ),
           Positioned(

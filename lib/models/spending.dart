@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
 
 class Spending {
   String? id;
@@ -24,30 +24,30 @@ class Spending {
   });
 
   Map<String, dynamic> toMap() => {
-    "money": money,
-    "type": type,
-    "note": note,
-    "date": dateTime,
-    "image": image,
-    "typeName": typeName,
-    "location": location,
-    "friends": friends
-  };
+        "money": money,
+        "type": type,
+        "note": note,
+        "date": dateTime.millisecondsSinceEpoch,
+        "image": image,
+        "typeName": typeName,
+        "location": location,
+        "friends": friends == null ? null : jsonEncode(friends),
+      };
 
-  factory Spending.fromFirebase(DocumentSnapshot snapshot) {
-    var data = snapshot.data() as Map<String, dynamic>;
+  factory Spending.fromDb(Map<String, dynamic> data) {
     return Spending(
-        id: snapshot.id,
-        money: data["money"],
-        type: data["type"],
-        dateTime: (data["date"] as Timestamp).toDate(),
-        note: data["note"],
-        image: data["image"],
-        typeName: data["typeName"],
-        location: data["location"],
-        friends: (data["friends"] as List<dynamic>)
-            .map((e) => e.toString())
-            .toList());
+      id: data["id"].toString(),
+      money: data["money"] as int,
+      type: data["type"] as int,
+      dateTime: DateTime.fromMillisecondsSinceEpoch(data["date"] as int),
+      note: data["note"] as String?,
+      image: data["image"] as String?,
+      typeName: data["typeName"] as String?,
+      location: data["location"] as String?,
+      friends: data["friends"] == null
+          ? []
+          : List<String>.from(jsonDecode(data["friends"] as String)),
+    );
   }
 
   Spending copyWith({

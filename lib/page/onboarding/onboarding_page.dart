@@ -96,7 +96,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                 minimumSize: const Size.fromHeight(60),
               ),
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/login');
+                Navigator.pushReplacementNamed(context, '/setup-lock');
               },
               child: Text(
                 AppLocalizations.of(context).translate('get_started'),
