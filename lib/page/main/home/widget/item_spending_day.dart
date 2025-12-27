@@ -1,4 +1,3 @@
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -130,12 +129,6 @@ class _ItemSpendingDayState extends State<ItemSpendingDay> {
                   builder: (context) => ViewSpendingPage(
                     spending: list[index],
                     change: (spending) async {
-                      try {
-                        spending.image = await FirebaseStorage.instance
-                            .ref()
-                            .child("spending/${spending.id}.png")
-                            .getDownloadURL();
-                      } catch (_) {}
                       widget.spendingList.removeWhere((element) =>
                           element.id!.compareTo(spending.id!) == 0);
                       setState(() {

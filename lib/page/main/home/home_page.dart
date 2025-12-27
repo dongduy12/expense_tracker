@@ -1,8 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:expense_tracker/constants/function/extension.dart';
+import 'package:expense_tracker/constants/function/get_data_spending.dart';
+import 'package:expense_tracker/controls/spending_firebase.dart';
 import 'package:expense_tracker/models/spending.dart';
 import 'package:expense_tracker/page/main/home/widget/item_spending_widget.dart';
 import 'package:expense_tracker/page/main/home/widget/summary_spending.dart';
@@ -41,54 +41,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: StreamBuilder(
-          stream: FirebaseFirestore.instance
-              .collection("data")
-              .doc(FirebaseAuth.instance.currentUser!.uid)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              List<String> list = [];
-
-              if (snapshot.requireData.data() != null) {
-                var data = snapshot.requireData.data() as Map<String, dynamic>;
-
-                if (data[DateFormat("MM_yyyy")
-                    .format(months[18 - _monthController.index])] !=
-                    null) {
-                  list = (data[DateFormat("MM_yyyy")
-                      .format(months[18 - _monthController.index])]
-                  as List<dynamic>)
-                      .map((e) => e.toString())
-                      .toList();
-                }
-              }
-
-              return StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection("spending")
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    var spendingList = snapshot.data!.docs
-                        .where((element) => list.contains(element.id))
-                        .map((e) => Spending.fromFirebase(e))
-                        .toList();
-
-                    return body(spendingList: spendingList);
-                  }
-                  return loading();
-                },
-              );
-            }
-            return loading();
-          },
-        ),
+        child: ValueListenableBuilder<List<Spending>>(
+            valueListenable: SpendingFirebase.spendingNotifier,
+            builder: (context, spendingList, _) {
+              final selectedMonth = months[18 - _monthController.index];
+              final filtered = spendingList
+                  .where(
+                    (element) =>
+                        isSameMonth(element.dateTime, selectedMonth),
+                  )
+                  .toList();
+              return body(spendingList: filtered);
+            }),
       ),
     );
   }
 
-  Widget body({List<Spending>? spendingList}) {
+  Widget body({List<Spending> spendingList = const []}) {
     return Column(
       children: [
         const SizedBox(height: 10),
@@ -137,7 +106,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
         ),
         const SizedBox(height: 10),
-        spendingList!.isNotEmpty
+        spendingList.isNotEmpty
             ? Expanded(child: ItemSpendingWidget(spendingList: spendingList))
             : Expanded(
           child: Center(

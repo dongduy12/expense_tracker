@@ -1,6 +1,4 @@
 import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:expense_tracker/page/main/home/widget/item_spending_day.dart';
@@ -28,32 +26,17 @@ class HistoryPage extends StatelessWidget {
         ),
       ),
       body: FutureBuilder(
-        future: FirebaseFirestore.instance
-            .collection("data")
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .get(),
+        future: SpendingFirebase.getSpendingByRange(
+          DateTime(2000),
+          DateTime.now(),
+        ),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            var data = (snapshot.requireData.data() ?? <String, dynamic>{});
-            List<String> listID = [];
-            for (var list in data.values) {
-              listID.addAll(
-                  (list as List<dynamic>).map((e) => e.toString()).toList());
-            }
+            List<Spending> listSpending = snapshot.requireData;
+            listSpending.sort(
+                (a, b) => b.dateTime.difference(a.dateTime).inSeconds);
 
-            return FutureBuilder(
-              future: SpendingFirebase.getSpendingList(listID),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  List<Spending> listSpending = snapshot.requireData;
-                  listSpending.sort(
-                          (a, b) => b.dateTime.difference(a.dateTime).inSeconds);
-
-                  return ItemSpendingDay(spendingList: listSpending);
-                }
-                return loading();
-              },
-            );
+            return ItemSpendingDay(spendingList: listSpending);
           }
           return loading();
         },

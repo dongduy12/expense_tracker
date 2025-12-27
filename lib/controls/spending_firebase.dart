@@ -1,216 +1,254 @@
+import 'dart:convert';
 import 'dart:io';
-import 'package:expense_tracker/constants/function/get_data_spending.dart';
+
 import 'package:expense_tracker/models/spending.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:intl/intl.dart';
 import 'package:expense_tracker/models/user.dart' as myuser;
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:sqflite/sqflite.dart';
 
-class SpendingFirebase {
-  static Future addSpending(Spending spending) async {
-    var firestoreSpending =
-        FirebaseFirestore.instance.collection("spending").doc();
+class LocalDatabase {
+  LocalDatabase._();
 
-    var firestoreData = FirebaseFirestore.instance
-        .collection("data")
-        .doc(FirebaseAuth.instance.currentUser!.uid);
+  static final LocalDatabase instance = LocalDatabase._();
+  Database? _database;
 
-    if (spending.image != null) {
-      spending.image = await uploadImage(
-          folder: "spending",
-          name: "${firestoreSpending.id}.png",
-          image: File(spending.image!));
-    }
-
-    await firestoreSpending.set(spending.toMap());
-
-    await firestoreData.get().then((value) {
-      List<String> dataSpending = [];
-      if (value.exists) {
-        var data = value.data() as Map<String, dynamic>;
-        if (data[DateFormat("MM_yyyy").format(spending.dateTime)] != null) {
-          dataSpending = (data[DateFormat("MM_yyyy").format(spending.dateTime)]
-                  as List<dynamic>)
-              .map((e) => e.toString())
-              .toList();
-          dataSpending.add(firestoreSpending.id);
-          firestoreData.update(
-              {DateFormat("MM_yyyy").format(spending.dateTime): dataSpending});
-        } else {
-          dataSpending.add(firestoreSpending.id);
-          data.addAll(
-              {DateFormat("MM_yyyy").format(spending.dateTime): dataSpending});
-          firestoreData.set(data);
-        }
-      } else {
-        dataSpending.add(firestoreSpending.id);
-        firestoreData.set(
-            {DateFormat("MM_yyyy").format(spending.dateTime): dataSpending});
-      }
-    });
+  Future<Database> get database async {
+    if (_database != null) return _database!;
+    _database = await _initDatabase();
+    return _database!;
   }
 
-  static Future updateSpending(
+  Future<Database> _initDatabase() async {
+    final documentsDirectory = await getApplicationDocumentsDirectory();
+    final path = p.join(documentsDirectory.path, 'expense_tracker.db');
+
+    return openDatabase(
+      path,
+      version: 1,
+      onCreate: (db, version) async {
+        await db.execute('''
+          CREATE TABLE spending(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            money INTEGER,
+            type INTEGER,
+            note TEXT,
+            date INTEGER,
+            image TEXT,
+            typeName TEXT,
+            location TEXT,
+            friends TEXT
+          );
+        ''');
+
+        await db.execute('''
+          CREATE TABLE wallet(
+            month TEXT PRIMARY KEY,
+            amount INTEGER
+          );
+        ''');
+
+        await db.execute('''
+          CREATE TABLE info(
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            birthday TEXT,
+            avatar TEXT,
+            gender INTEGER,
+            money INTEGER
+          );
+        ''');
+
+        await db.execute('''
+          CREATE TABLE history(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            term TEXT
+          );
+        ''');
+
+        await db.insert('info', {
+          'id': 1,
+          'name': 'User',
+          'birthday': '01/01/2000',
+          'avatar': myuser.defaultAvatar,
+          'gender': 1,
+          'money': 0,
+        });
+      },
+    );
+  }
+}
+
+class SpendingFirebase {
+  SpendingFirebase._();
+
+  static final SpendingFirebase instance = SpendingFirebase._();
+  static final spendingNotifier = ValueNotifier<List<Spending>>([]);
+  static final userNotifier = ValueNotifier<myuser.User?>(null);
+
+  static Future<void> init() async {
+    await _refreshSpending();
+    await _refreshUser();
+  }
+
+  static Future<Database> get _db async => LocalDatabase.instance.database;
+
+  static Future<void> _refreshSpending() async {
+    final db = await _db;
+    final data = await db.query('spending', orderBy: 'date DESC');
+    spendingNotifier.value =
+        data.map((e) => Spending.fromDb(e)).toList(growable: false);
+  }
+
+  static Future<void> _refreshUser() async {
+    final db = await _db;
+    final data = await db.query('info', where: 'id = 1');
+    if (data.isNotEmpty) {
+      userNotifier.value = myuser.User.fromDb(data.first);
+    }
+  }
+
+  static Future<void> addSpending(Spending spending) async {
+    final db = await _db;
+    await db.insert('spending', spending.toMap());
+    await _refreshSpending();
+  }
+
+  static Future<void> updateSpending(
     Spending spending,
     DateTime oldDay,
     File? image,
     bool check,
   ) async {
-    var firestoreSpending =
-        FirebaseFirestore.instance.collection("spending").doc(spending.id);
-
-    var firestoreData = FirebaseFirestore.instance
-        .collection("data")
-        .doc(FirebaseAuth.instance.currentUser!.uid);
-
     if (image != null) {
-      spending.image = await uploadImage(
-          folder: "spending",
-          name: "${firestoreSpending.id}.png",
-          image: image);
+      spending = spending.copyWith(image: image.path);
     } else if (check) {
-      await FirebaseStorage.instance
-          .ref()
-          .child("spending/${spending.id}.png")
-          .delete();
-      spending.image = null;
+      spending = spending.copyWith(image: null);
     }
 
-    firestoreSpending.update(spending.toMap());
-
-    await firestoreData.get().then((value) {
-      List<String> dataSpending = [];
-      var data = value.data() as Map<String, dynamic>;
-      if (!isSameMonth(spending.dateTime, oldDay)) {
-        //xóa cái id cũ ra khỏi tháng đó
-        dataSpending =
-            (data[DateFormat("MM_yyyy").format(oldDay)] as List<dynamic>)
-                .map((e) => e.toString())
-                .toList();
-        dataSpending.remove(spending.id!);
-        firestoreData
-            .update({DateFormat("MM_yyyy").format(oldDay): dataSpending});
-
-        // thêm id vào tháng mới
-        if (data[DateFormat("MM_yyyy").format(spending.dateTime)] != null) {
-          dataSpending = (data[DateFormat("MM_yyyy").format(spending.dateTime)]
-                  as List<dynamic>)
-              .map((e) => e.toString())
-              .toList();
-          dataSpending.add(spending.id!);
-          firestoreData.update(
-              {DateFormat("MM_yyyy").format(spending.dateTime): dataSpending});
-        } else {
-          dataSpending.add(spending.id!);
-          data.addAll(
-              {DateFormat("MM_yyyy").format(spending.dateTime): dataSpending});
-          firestoreData.set(data);
-        }
-      }
-    });
+    final db = await _db;
+    await db.update(
+      'spending',
+      spending.toMap(),
+      where: 'id = ?',
+      whereArgs: [spending.id],
+    );
+    await _refreshSpending();
   }
 
-  static Future deleteSpending(Spending spending) async {
-    var firestoreData = FirebaseFirestore.instance
-        .collection("data")
-        .doc(FirebaseAuth.instance.currentUser!.uid);
-
-    await firestoreData.get().then((value) async {
-      List<String> dataSpending = [];
-
-      var data = value.data() as Map<String, dynamic>;
-      if (data[DateFormat("MM_yyyy").format(spending.dateTime)] != null) {
-        dataSpending = (data[DateFormat("MM_yyyy").format(spending.dateTime)]
-                as List<dynamic>)
-            .map((e) => e.toString())
-            .toList();
-        dataSpending.remove(spending.id);
-        firestoreData.update(
-            {DateFormat("MM_yyyy").format(spending.dateTime): dataSpending});
-      }
-
-      if (spending.image != null) {
-        await FirebaseStorage.instance
-            .ref()
-            .child("spending/${spending.id}.png")
-            .delete();
-      }
-
-      await FirebaseFirestore.instance
-          .collection("spending")
-          .doc(spending.id)
-          .delete();
-    });
+  static Future<void> deleteSpending(Spending spending) async {
+    final db = await _db;
+    await db.delete('spending', where: 'id = ?', whereArgs: [spending.id]);
+    await _refreshSpending();
   }
 
   static Future<List<Spending>> getSpendingList(List<String> list) async {
-    List<Spending> spendingList = [];
-    for (var element in list) {
-      await FirebaseFirestore.instance
-          .collection("spending")
-          .doc(element)
-          .get()
-          .then((value) {
-        Spending spending = Spending.fromFirebase(value);
-        spendingList.add(spending);
-      });
-    }
-    return spendingList;
+    if (list.isEmpty) return [];
+    final db = await _db;
+    final data = await db.query(
+      'spending',
+      where: 'id IN (${List.filled(list.length, '?').join(',')})',
+      whereArgs: list,
+      orderBy: 'date DESC',
+    );
+    return data.map((e) => Spending.fromDb(e)).toList();
   }
 
-  static Future updateInfo({required myuser.User user, File? image}) async {
+  static Future<List<Spending>> getSpendingByMonth(DateTime date) async {
+    final db = await _db;
+    final firstDay = DateTime(date.year, date.month, 1);
+    final lastDay = DateTime(date.year, date.month + 1, 1);
+    final data = await db.query(
+      'spending',
+      where: 'date >= ? AND date < ?',
+      whereArgs: [firstDay.millisecondsSinceEpoch, lastDay.millisecondsSinceEpoch],
+      orderBy: 'date DESC',
+    );
+    return data.map((e) => Spending.fromDb(e)).toList();
+  }
+
+  static Future<List<Spending>> getSpendingByRange(DateTime start, DateTime end) async {
+    final db = await _db;
+    final data = await db.query(
+      'spending',
+      where: 'date >= ? AND date <= ?',
+      whereArgs: [start.millisecondsSinceEpoch, end.millisecondsSinceEpoch],
+      orderBy: 'date DESC',
+    );
+    return data.map((e) => Spending.fromDb(e)).toList();
+  }
+
+  static Future<myuser.User> getUser() async {
+    final db = await _db;
+    final data = await db.query('info', where: 'id = 1');
+    return myuser.User.fromDb(data.first);
+  }
+
+  static Future<void> updateInfo({required myuser.User user, File? image}) async {
     if (image != null) {
-      user.avatar = await uploadImage(
-        folder: "avatar",
-        name: "${FirebaseAuth.instance.currentUser!.uid}.png",
-        image: image,
-      );
+      user = user.copyWith(avatar: image.path);
     }
 
-    updateWalletMoney(user.money);
-
-    FirebaseFirestore.instance
-        .collection("info")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .update(user.toMap());
+    final db = await _db;
+    await db.update('info', user.toMap(), where: 'id = 1');
+    await updateWalletMoney(user.money);
+    await _refreshUser();
   }
 
-  static Future updateWalletMoney(int money) async {
-    FirebaseFirestore.instance
-        .collection("wallet")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get()
-        .then((value) {
-      var data = value.data() as Map<String, dynamic>;
-      data[DateFormat("MM_yyyy").format(DateTime.now())] = money;
-      FirebaseFirestore.instance
-          .collection("wallet")
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .update(data);
-    });
+  static Future<void> updateWalletMoney(int money) async {
+    final db = await _db;
+    final monthKey = DateFormat('MM_yyyy').format(DateTime.now());
+    final exists = await db.query('wallet', where: 'month = ?', whereArgs: [monthKey]);
+    if (exists.isEmpty) {
+      await db.insert('wallet', {'month': monthKey, 'amount': money});
+    } else {
+      await db.update('wallet', {'amount': money}, where: 'month = ?', whereArgs: [monthKey]);
+    }
   }
 
-  static Future addWalletMoney(int money) async {
-    var data = {DateFormat("MM_yyyy").format(DateTime.now()): money};
-    FirebaseFirestore.instance
-        .collection("wallet")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .set(data);
+  static Future<void> addWalletMoney(int money) async {
+    final db = await _db;
+    final monthKey = DateFormat('MM_yyyy').format(DateTime.now());
+    final exists = await db.query('wallet', where: 'month = ?', whereArgs: [monthKey]);
+    if (exists.isEmpty) {
+      await db.insert('wallet', {'month': monthKey, 'amount': money});
+    } else {
+      await db.update('wallet', {'amount': money}, where: 'month = ?', whereArgs: [monthKey]);
+    }
 
-    FirebaseFirestore.instance
-        .collection("info")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .update({"money": money});
+    await db.update('info', {'money': money}, where: 'id = 1');
   }
 
-  static Future<String> uploadImage({
-    required String folder,
-    required String name,
-    required File image,
-  }) async {
-    Reference upload = FirebaseStorage.instance.ref().child("$folder/$name");
-    await upload.putFile(image);
-    return await upload.getDownloadURL();
+  static Future<int> getWallet(DateTime date) async {
+    final db = await _db;
+    final monthKey = DateFormat('MM_yyyy').format(date);
+    final data = await db.query('wallet', where: 'month = ?', whereArgs: [monthKey]);
+    if (data.isEmpty) {
+      final user = await getUser();
+      await db.insert('wallet', {'month': monthKey, 'amount': user.money});
+      return user.money;
+    }
+    return data.first['amount'] as int;
+  }
+
+  static Future<List<String>> getHistory(String query) async {
+    final db = await _db;
+    final data = await db.query('history', orderBy: 'id DESC');
+    return data
+        .map((e) => e['term'] as String)
+        .where((term) => term.toUpperCase().contains(query.toUpperCase()))
+        .toList();
+  }
+
+  static Future<void> saveHistory(String term) async {
+    final db = await _db;
+    final existing = await db.query('history', where: 'term = ?', whereArgs: [term]);
+    if (existing.isEmpty) {
+      await db.insert('history', {'term': term});
+    } else {
+      await db.update('history', {'term': term}, where: 'id = ?', whereArgs: [existing.first['id']]);
+    }
   }
 }

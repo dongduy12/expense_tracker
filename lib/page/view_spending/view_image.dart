@@ -1,6 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
 
 class ViewImage extends StatefulWidget {
   const ViewImage({Key? key, required this.url}) : super(key: key);
@@ -64,21 +63,17 @@ class _ViewImageImageState extends State<ViewImage> {
               clipBehavior: Clip.none,
               minScale: 1,
               maxScale: 4,
-              child: CachedNetworkImage(
-                imageUrl: widget.url,
-                width: MediaQuery.of(context).size.width,
-                fit: BoxFit.fitWidth,
-                placeholder: (context, url) => Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
-                  child: Container(
-                    height: MediaQuery.of(context).size.width,
-                    width: MediaQuery.of(context).size.width,
-                    color: Colors.grey,
-                  ),
-                ),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-              ),
+              child: widget.url.startsWith('http')
+                  ? Image.network(
+                      widget.url,
+                      width: MediaQuery.of(context).size.width,
+                      fit: BoxFit.fitWidth,
+                    )
+                  : Image.file(
+                      File(widget.url),
+                      width: MediaQuery.of(context).size.width,
+                      fit: BoxFit.fitWidth,
+                    ),
             ),
           ),
         ),

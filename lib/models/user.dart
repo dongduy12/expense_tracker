@@ -1,7 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-const defaultAvatar =
-    "https://firebasestorage.googleapis.com/v0/b/spending-management-c955a.appspot.com/o/FVK7wz5aIAA25l8.jpg?alt=media&token=ddceb8f7-7cf7-4c42-a806-5d0d48ce58f5";
+const defaultAvatar = "assets/images/male.png";
 
 class User {
   String name;
@@ -21,18 +18,17 @@ class User {
         "name": name,
         "birthday": birthday,
         "avatar": avatar,
-        "gender": gender,
+        "gender": gender ? 1 : 0,
         "money": money
       };
 
-  factory User.fromFirebase(DocumentSnapshot snapshot) {
-    var data = snapshot.data() as Map<String, dynamic>;
+  factory User.fromDb(Map<String, dynamic> data) {
     return User(
-      name: data["name"],
-      birthday: data["birthday"],
-      avatar: data["avatar"],
-      money: data["money"],
-      gender: data['gender'] as bool,
+      name: data["name"] as String,
+      birthday: data["birthday"] as String,
+      avatar: data["avatar"] as String,
+      money: data["money"] as int,
+      gender: (data['gender'] as int) == 1,
     );
   }
 

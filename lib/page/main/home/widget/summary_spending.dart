@@ -1,13 +1,9 @@
-import 'dart:math';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../../controls/spending_firebase.dart';
 import '../../../../models/spending.dart';
-import '../../../../models/user.dart' as myuser;
 import '../../../../setting/localization/app_localizations.dart';
 
 class SummarySpending extends StatefulWidget {
@@ -21,57 +17,23 @@ class SummarySpending extends StatefulWidget {
 class _SummarySpendingState extends State<SummarySpending> {
   final numberFormat = NumberFormat.currency(locale: "vi_VI");
 
-  Future initWallet({Map<String, dynamic>? data}) async {
-    FirebaseFirestore.instance
-        .collection("info")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get()
-        .then((value) {
-      myuser.User user = myuser.User.fromFirebase(value);
-      var walletData = data ?? {};
-      walletData
-          .addAll({DateFormat("MM_yyyy").format(DateTime.now()): user.money});
-
-      FirebaseFirestore.instance
-          .collection("wallet")
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .set(walletData);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return widget.spendingList != null
-        ? StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection("wallet")
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .snapshots(),
+        ? FutureBuilder<int>(
+            future: SpendingFirebase.getWallet(DateTime.now()),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                if (snapshot.requireData.data() != null) {
-                  var data = snapshot.requireData.data();
-                  var wallet =
-                      data![DateFormat("MM_yyyy").format(DateTime.now())];
-                  int sum = 0;
-                  if (widget.spendingList!.isNotEmpty) {
-                    sum = widget.spendingList!
-                        .map((e) => e.money)
-                        .reduce((value, element) => value + element);
-                  }
-                  if (wallet != null) {
-                    return body(wallet, sum);
-                  } else {
-                    initWallet(data: data);
-                    return loadingSummary();
-                  }
-                } else {
-                  initWallet();
-                  return loadingSummary();
-                }
+                final wallet = snapshot.data ?? 0;
+                final sum = widget.spendingList!.fold<int>(
+                  0,
+                  (value, element) => value + element.money,
+                );
+                return body(wallet, sum);
               }
               return loadingSummary();
-            })
+            },
+          )
         : loadingSummary();
   }
 

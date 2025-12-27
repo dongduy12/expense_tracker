@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart' hide Filter;
 import 'package:expense_tracker/constants/function/extension.dart';
 import 'package:expense_tracker/constants/function/route_function.dart';
 import 'package:expense_tracker/constants/list.dart';
@@ -9,7 +8,6 @@ import 'package:expense_tracker/page/main/analytic/widget/filter_page.dart';
 import 'package:expense_tracker/page/main/analytic/widget/my_search_delegate.dart';
 import 'package:expense_tracker/page/main/home/widget/item_spending_day.dart';
 import 'package:expense_tracker/setting/localization/app_localizations.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -72,7 +70,7 @@ class _SearchPageState extends State<SearchPage> {
       return false;
     }
 
-    if (filter.friends!.isNotEmpty) {
+    if (filter.friends!.isNotEmpty && spending.friends != null) {
       List<String> list = filter.friends!
           .where((element) => spending.friends!.contains(element))
           .toList();
@@ -80,7 +78,13 @@ class _SearchPageState extends State<SearchPage> {
       if (list.isEmpty) return false;
     }
 
-    if (spending.note != null && !spending.note!.contains(filter.note)) {
+    if (filter.friends!.isNotEmpty && spending.friends == null) {
+      return false;
+    }
+
+    if (spending.note != null &&
+        filter.note.isNotEmpty &&
+        !spending.note!.contains(filter.note)) {
       return false;
     }
     return true;
@@ -136,42 +140,20 @@ class _SearchPageState extends State<SearchPage> {
       ),
       body: query == null
           ? Container()
-          : FutureBuilder(
-              future: FirebaseFirestore.instance
-                  .collection("data")
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .get(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  var data =
-                      snapshot.requireData.data() as Map<String, dynamic>;
-                  List<String> list = [];
-                  for (var element in data.entries) {
-                    list.addAll((element.value as List<dynamic>)
-                        .map((e) => e.toString())
-                        .toList());
-                  }
-                  return FutureBuilder(
-                      future: SpendingFirebase.getSpendingList(list),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          var spendingList = snapshot.data;
-                          var list = spendingList!.where(checkResult).toList();
-                          if (list.isEmpty) {
-                            return Center(
-                              child: Text(
-                                AppLocalizations.of(context)
-                                    .translate('nothing_here'),
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                            );
-                          }
-                          return ItemSpendingDay(spendingList: list);
-                        }
-                        return const Center(child: CircularProgressIndicator());
-                      });
+          : ValueListenableBuilder(
+              valueListenable: SpendingFirebase.spendingNotifier,
+              builder: (context, spendingList, _) {
+                var list = spendingList.where(checkResult).toList();
+                if (list.isEmpty) {
+                  return Center(
+                    child: Text(
+                      AppLocalizations.of(context)
+                          .translate('nothing_here'),
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  );
                 }
-                return const Center(child: CircularProgressIndicator());
+                return ItemSpendingDay(spendingList: list);
               }),
     );
   }
