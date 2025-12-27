@@ -37,6 +37,7 @@ class _ProfilePageState extends State<ProfilePage> {
   var numberFormat = NumberFormat.currency(locale: "vi_VI");
   int language = 0;
   bool darkMode = false;
+  bool lockEnabled = false;
 
   @override
   void initState() {
@@ -45,6 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
         language = value.getInt('language') ??
             (Platform.localeName.split('_')[0] == "vi" ? 0 : 1);
         darkMode = value.getBool("isDark") ?? false;
+        lockEnabled = value.getBool("app_lock_enabled") ?? false;
       });
     });
     super.initState();
@@ -125,6 +127,49 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                       const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.blueGrey,
+                              borderRadius: BorderRadius.circular(90),
+                            ),
+                            padding: const EdgeInsets.all(10),
+                            child: const Icon(
+                              Icons.lock_outline,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            AppLocalizations.of(context)
+                                .translate('create_app_password'),
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                          const Spacer(),
+                          FlutterSwitch(
+                            height: 30,
+                            width: 60,
+                            value: lockEnabled,
+                            onToggle: (value) async {
+                              if (value) {
+                                await Navigator.pushNamed(
+                                    context, '/setup-lock');
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                setState(() => lockEnabled =
+                                    prefs.getBool('app_lock_enabled') ?? false);
+                              } else {
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setBool('app_lock_enabled', false);
+                                setState(() => lockEnabled = false);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
                       settingItem(
                         text: AppLocalizations.of(context).translate('history'),
                         action: () {
@@ -191,7 +236,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           },
                           child: Text(
                             AppLocalizations.of(context)
-                                .translate('change_password'),
+                                .translate('create_app_password'),
                             style: AppStyles.p,
                           ),
                         ),

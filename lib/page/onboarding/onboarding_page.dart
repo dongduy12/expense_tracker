@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../constants/app_colors.dart';
@@ -95,8 +96,12 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                 backgroundColor: AppColors.buttonLogin,
                 minimumSize: const Size.fromHeight(60),
               ),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/setup-lock');
+              onPressed: () async {
+                final prefs = await SharedPreferences.getInstance();
+                final lockEnabled = prefs.getBool('app_lock_enabled') ?? false;
+                if (!mounted) return;
+                Navigator.pushReplacementNamed(
+                    context, lockEnabled ? '/unlock' : '/main');
               },
               child: Text(
                 AppLocalizations.of(context).translate('get_started'),

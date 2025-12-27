@@ -14,6 +14,7 @@ import 'package:expense_tracker/setting/localization/app_localizations_setup.dar
 int? language;
 bool isDark = false;
 bool isFirstStart = true;
+bool appLockEnabled = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +23,7 @@ void main() async {
   language = prefs.getInt('language');
   isDark = prefs.getBool("isDark") ?? false;
   isFirstStart = prefs.getBool("firstStart") ?? true;
+  appLockEnabled = prefs.getBool("app_lock_enabled") ?? false;
   runApp(const MyApp());
 }
 
@@ -81,7 +83,9 @@ class MyApp extends StatelessWidget {
                       ),
                       primaryColor: const Color.fromRGBO(242, 243, 247, 1),
                     ),
-              initialRoute: isFirstStart ? "/" : "/unlock",
+              initialRoute: isFirstStart
+                  ? "/"
+                  : (appLockEnabled ? "/unlock" : "/main"),
               routes: {
                 '/': (context) => const OnBoardingPage(),
                 '/unlock': (context) => const AppLockPage(),

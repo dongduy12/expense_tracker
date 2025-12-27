@@ -44,6 +44,7 @@ class _AppLockPageState extends State<AppLockPage> {
         return;
       }
       await prefs.setString('app_password', _passwordController.text);
+      await prefs.setBool('app_lock_enabled', true);
       await prefs.setBool('firstStart', false);
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/main');
