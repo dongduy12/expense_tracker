@@ -1,5 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:expense_tracker/controls/spending_firebase.dart';
 import 'package:flutter/material.dart';
 
 class MySearchDelegate extends SearchDelegate<String> {
@@ -41,25 +40,11 @@ class MySearchDelegate extends SearchDelegate<String> {
       check = false;
     }
 
-    return FutureBuilder(
-      future: FirebaseFirestore.instance
-          .collection("history")
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .get(),
+    return FutureBuilder<List<String>>(
+      future: SpendingFirebase.getHistory(query),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          var snapshotData = snapshot.requireData.data();
-          if (snapshotData == null) return Container();
-
-          var data = snapshotData;
-          List<String> history = (data["history"] as List<dynamic>)
-              .map((e) => e.toString())
-              .where((element) =>
-                  element.toUpperCase().contains(query.toUpperCase()))
-              .toList()
-              .reversed
-              .toList();
-
+          var history = snapshot.data!;
           return ListView.builder(
             itemCount: history.length,
             itemBuilder: (context, index) {
@@ -108,29 +93,7 @@ class MySearchDelegate extends SearchDelegate<String> {
   void showResults(BuildContext context) {
     // super.showResults(context);
     if (query.isNotEmpty) {
-      var firestore = FirebaseFirestore.instance
-          .collection("history")
-          .doc(FirebaseAuth.instance.currentUser!.uid);
-
-      firestore.get().then((value) {
-        var data = {};
-        if (value.data() != null) {
-          data = value.data() as Map<String, dynamic>;
-        }
-        List<String> history = [];
-        if (data["history"] != null) {
-          history = (data["history"] as List<dynamic>)
-              .map((e) => e.toString())
-              .toList();
-        }
-        history.remove(query);
-        history.add(query);
-        if (value.data() == null) {
-          firestore.set({"history": history});
-        } else {
-          firestore.update({"history": history});
-        }
-      });
+      SpendingFirebase.saveHistory(query);
       close(context, query);
     }
   }

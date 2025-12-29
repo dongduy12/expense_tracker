@@ -1,17 +1,13 @@
 import 'dart:io' show Directory, File, Platform;
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:expense_tracker/firebase_options.dart';
+import 'package:expense_tracker/controls/spending_firebase.dart';
+import 'package:expense_tracker/page/lock/app_lock_page.dart';
 import 'package:expense_tracker/page/main/profile/about_page.dart';
-import 'package:expense_tracker/page/main/profile/change_password.dart';
 import 'package:expense_tracker/page/main/profile/currency_exchange_rate.dart';
 import 'package:expense_tracker/page/main/profile/edit_profile_page.dart';
 import 'package:expense_tracker/page/main/profile/history_page.dart';
@@ -41,7 +37,7 @@ class _ProfilePageState extends State<ProfilePage> {
   var numberFormat = NumberFormat.currency(locale: "vi_VI");
   int language = 0;
   bool darkMode = false;
-  bool loginMethod = false;
+  bool lockEnabled = false;
 
   @override
   void initState() {
@@ -50,7 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
         language = value.getInt('language') ??
             (Platform.localeName.split('_')[0] == "vi" ? 0 : 1);
         darkMode = value.getBool("isDark") ?? false;
-        loginMethod = value.getBool("login") ?? false;
+        lockEnabled = value.getBool("app_lock_enabled") ?? false;
       });
     });
     super.initState();
@@ -62,18 +58,10 @@ class _ProfilePageState extends State<ProfilePage> {
       body: SafeArea(
         child: Column(
           children: [
-            StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection("info")
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  myuser.User user =
-                      myuser.User.fromFirebase(snapshot.requireData);
-                  return InfoWidget(user: user);
-                }
-                return const InfoWidget();
+            ValueListenableBuilder<myuser.User?>(
+              valueListenable: SpendingFirebase.userNotifier,
+              builder: (context, user, _) {
+                return InfoWidget(user: user);
               },
             ),
             const SizedBox(height: 10),
@@ -95,20 +83,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         icon: FontAwesomeIcons.solidUser,
                         color: const Color.fromRGBO(0, 150, 255, 1),
                       ),
-                      if (loginMethod) const SizedBox(height: 20),
-                      if (loginMethod)
-                        settingItem(
-                          text: AppLocalizations.of(context)
-                              .translate('change_password'),
-                          action: () {
-                            Navigator.of(context).push(createRoute(
-                              screen: const ChangePassword(),
-                              begin: const Offset(1, 0),
-                            ));
-                          },
-                          icon: FontAwesomeIcons.lock,
-                          color: const Color.fromRGBO(233, 116, 81, 1),
-                        ),
                       const SizedBox(height: 20),
                       settingItem(
                         text:
@@ -148,6 +122,49 @@ class _ProfilePageState extends State<ProfilePage> {
                               final prefs =
                                   await SharedPreferences.getInstance();
                               await prefs.setBool('isDark', darkMode);
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.blueGrey,
+                              borderRadius: BorderRadius.circular(90),
+                            ),
+                            padding: const EdgeInsets.all(10),
+                            child: const Icon(
+                              Icons.lock_outline,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            AppLocalizations.of(context)
+                                .translate('create_app_password'),
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                          const Spacer(),
+                          FlutterSwitch(
+                            height: 30,
+                            width: 60,
+                            value: lockEnabled,
+                            onToggle: (value) async {
+                              if (value) {
+                                await Navigator.pushNamed(
+                                    context, '/setup-lock');
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                setState(() => lockEnabled =
+                                    prefs.getBool('app_lock_enabled') ?? false);
+                              } else {
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setBool('app_lock_enabled', false);
+                                setState(() => lockEnabled = false);
+                              }
                             },
                           ),
                         ],
@@ -214,24 +231,12 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                           onPressed: () async {
-                            await FirebaseAuth.instance.signOut();
-
-                            // CODE MỚI: Đăng xuất đúng chuẩn v7
-                            try {
-                              await GoogleSignIn.instance.signOut();
-                              // Có thể gọi thêm disconnect() nếu muốn hủy hoàn toàn quyền
-                              // await GoogleSignIn.instance.disconnect();
-                            } catch (e) {
-                              print("SignOut Error: $e");
-                            }
-
-                            await FacebookAuth.instance.logOut();
                             if (!mounted) return;
-                            Navigator.pushNamedAndRemoveUntil(
-                                context, '/login', (route) => false);
+                            Navigator.pushNamed(context, '/setup-lock');
                           },
                           child: Text(
-                            AppLocalizations.of(context).translate('logout'),
+                            AppLocalizations.of(context)
+                                .translate('create_app_password'),
                             style: AppStyles.p,
                           ),
                         ),
@@ -332,29 +337,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future exportCSV() async {
-    List<Spending> spendingList = [];
-    await FirebaseFirestore.instance
-        .collection("data")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get()
-        .then((value) async {
-      var data = value.data() as Map<String, dynamic>;
-      List<String> listData = [];
-      for (var entry in data.entries) {
-        listData.addAll(
-            (entry.value as List<dynamic>).map((e) => e.toString()).toList());
-      }
-
-      for (var item in listData) {
-        await FirebaseFirestore.instance
-            .collection("spending")
-            .doc(item)
-            .get()
-            .then((value) {
-          spendingList.add(Spending.fromFirebase(value));
-        });
-      }
-    });
+    List<Spending> spendingList =
+        List<Spending>.from(SpendingFirebase.spendingNotifier.value);
     List<List<dynamic>> rows = [];
 
     List<dynamic> row = [

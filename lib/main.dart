@@ -1,39 +1,29 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart'; // <--- Thêm import này
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:expense_tracker/constants/app_colors.dart';
-import 'package:expense_tracker/firebase_options.dart';
-import 'package:expense_tracker/page/forgot/forgot_page.dart';
-import 'package:expense_tracker/page/forgot/success_page.dart';
-import 'package:expense_tracker/page/login/login_page.dart';
+import 'package:expense_tracker/controls/spending_firebase.dart';
+import 'package:expense_tracker/page/lock/app_lock_page.dart';
 import 'package:expense_tracker/page/main/home/home_page.dart';
 import 'package:expense_tracker/page/main/main_page.dart';
 import 'package:expense_tracker/page/onboarding/onboarding_page.dart';
-import 'package:expense_tracker/page/signup/verify/verify_page.dart';
 import 'package:expense_tracker/setting/bloc/setting_cubit.dart';
 import 'package:expense_tracker/setting/bloc/setting_state.dart';
 import 'package:expense_tracker/setting/localization/app_localizations_setup.dart';
 
-bool loginMethod = false;
 int? language;
 bool isDark = false;
 bool isFirstStart = true;
+bool appLockEnabled = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  // Khởi tạo Google Sign In 1 lần duy nhất
-  await GoogleSignIn.instance.initialize();
+  await SpendingFirebase.init();
   final prefs = await SharedPreferences.getInstance();
   language = prefs.getInt('language');
   isDark = prefs.getBool("isDark") ?? false;
   isFirstStart = prefs.getBool("firstStart") ?? true;
-  loginMethod = prefs.getBool("login") ?? false;
+  appLockEnabled = prefs.getBool("app_lock_enabled") ?? false;
   runApp(const MyApp());
 }
 
@@ -93,21 +83,15 @@ class MyApp extends StatelessWidget {
                       ),
                       primaryColor: const Color.fromRGBO(242, 243, 247, 1),
                     ),
-              initialRoute: FirebaseAuth.instance.currentUser == null
-                  ? (isFirstStart ? "/" : "/login")
-                  : loginMethod
-                      ? (FirebaseAuth.instance.currentUser!.emailVerified
-                          ? '/main'
-                          : '/verify')
-                      : '/main',
+              initialRoute: isFirstStart
+                  ? "/"
+                  : (appLockEnabled ? "/unlock" : "/main"),
               routes: {
                 '/': (context) => const OnBoardingPage(),
-                '/login': (context) => const LoginPage(),
+                '/unlock': (context) => const AppLockPage(),
+                '/setup-lock': (context) => const AppLockPage(setup: true),
                 '/home': (context) => const HomePage(),
                 '/main': (context) => const MainPage(),
-                '/forgot': (context) => const ForgotPage(),
-                '/success': (context) => const SuccessPage(),
-                '/verify': (context) => const VerifyPage(),
               },
             );
           }),
