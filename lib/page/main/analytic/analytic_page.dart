@@ -17,6 +17,8 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import '../../../constants/function/get_data_spending.dart';
+
 class AnalyticPage extends StatefulWidget {
   const AnalyticPage({Key? key}) : super(key: key);
 
