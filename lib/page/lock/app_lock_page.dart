@@ -18,6 +18,14 @@ class _AppLockPageState extends State<AppLockPage> {
   final TextEditingController _confirmController = TextEditingController();
   bool _obscure = true;
   String? _error;
+  bool _prefsLoaded = false;
+  String? _storedPassword;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStoredPassword();
+  }
 
   @override
   void dispose() {
@@ -26,10 +34,23 @@ class _AppLockPageState extends State<AppLockPage> {
     super.dispose();
   }
 
+  Future<void> _loadStoredPassword() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _storedPassword = prefs.getString('app_password');
+      _prefsLoaded = true;
+    });
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final prefs = await SharedPreferences.getInstance();
     final stored = prefs.getString('app_password');
+    setState(() {
+      _storedPassword = stored;
+      _prefsLoaded = true;
+    });
 
     // --- SỬA Ở ĐÂY: CƠ CHẾ TỰ ĐỘNG SỬA LỖI ---
     // Nếu đang ở màn hình Đăng nhập (!widget.setup) mà không tìm thấy mật khẩu (stored == null)
@@ -160,16 +181,17 @@ class _AppLockPageState extends State<AppLockPage> {
                     ),
                   ),
                   if (!widget.setup)
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(
-                            context, '/setup-lock');
-                      },
-                      child: Text(
-                        AppLocalizations.of(context)
-                            .translate('create_app_password'),
+                    if (_prefsLoaded && _storedPassword == null)
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(
+                              context, '/setup-lock');
+                        },
+                        child: Text(
+                          AppLocalizations.of(context)
+                              .translate('create_app_password'),
+                        ),
                       ),
-                    ),
                 ],
               ),
             ),
