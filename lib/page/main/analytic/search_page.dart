@@ -1,7 +1,7 @@
 import 'package:expense_tracker/constants/function/extension.dart';
 import 'package:expense_tracker/constants/function/route_function.dart';
 import 'package:expense_tracker/constants/list.dart';
-import 'package:expense_tracker/controls/spending_firebase.dart';
+import 'package:expense_tracker/controls/spending_repository.dart';
 import 'package:expense_tracker/models/filter.dart';
 import 'package:expense_tracker/models/spending.dart';
 import 'package:expense_tracker/page/main/analytic/widget/filter_page.dart';
@@ -141,7 +141,7 @@ class _SearchPageState extends State<SearchPage> {
       body: query == null
           ? Container()
           : ValueListenableBuilder(
-              valueListenable: SpendingFirebase.spendingNotifier,
+              valueListenable: SpendingRepository.spendingNotifier,
               builder: (context, spendingList, _) {
                 var list = spendingList.where(checkResult).toList();
                 if (list.isEmpty) {

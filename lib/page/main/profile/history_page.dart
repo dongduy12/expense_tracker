@@ -4,7 +4,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:expense_tracker/page/main/home/widget/item_spending_day.dart';
 import 'package:expense_tracker/page/main/home/widget/item_spending_widget.dart';
 
-import '../../../controls/spending_firebase.dart';
+import '../../../controls/spending_repository.dart';
 import '../../../models/spending.dart';
 import '../../../setting/localization/app_localizations.dart';
 
@@ -26,7 +26,7 @@ class HistoryPage extends StatelessWidget {
         ),
       ),
       body: FutureBuilder(
-        future: SpendingFirebase.getSpendingByRange(
+        future: SpendingRepository.getSpendingByRange(
           DateTime(2000),
           DateTime.now(),
         ),

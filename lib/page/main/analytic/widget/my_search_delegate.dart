@@ -1,4 +1,4 @@
-import 'package:expense_tracker/controls/spending_firebase.dart';
+import 'package:expense_tracker/controls/spending_repository.dart';
 import 'package:flutter/material.dart';
 
 class MySearchDelegate extends SearchDelegate<String> {
@@ -41,7 +41,7 @@ class MySearchDelegate extends SearchDelegate<String> {
     }
 
     return FutureBuilder<List<String>>(
-      future: SpendingFirebase.getHistory(query),
+      future: SpendingRepository.getHistory(query),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           var history = snapshot.data!;
@@ -93,7 +93,7 @@ class MySearchDelegate extends SearchDelegate<String> {
   void showResults(BuildContext context) {
     // super.showResults(context);
     if (query.isNotEmpty) {
-      SpendingFirebase.saveHistory(query);
+      SpendingRepository.saveHistory(query);
       close(context, query);
     }
   }

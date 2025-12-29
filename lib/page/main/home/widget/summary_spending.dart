@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../../../../controls/spending_firebase.dart';
+import '../../../../controls/spending_repository.dart';
 import '../../../../models/spending.dart';
 import '../../../../setting/localization/app_localizations.dart';
 
@@ -23,7 +23,7 @@ class _SummarySpendingState extends State<SummarySpending> {
   Widget build(BuildContext context) {
     return widget.spendingList != null
         ? FutureBuilder<int>(
-            future: SpendingFirebase.getWallet(DateTime.now()),
+            future: SpendingRepository.getWallet(DateTime.now()),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 final wallet = snapshot.data ?? 0;

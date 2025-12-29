@@ -12,7 +12,7 @@ import '../../../constants/app_colors.dart';
 import '../../../constants/app_styles.dart';
 import '../../../constants/function/loading_animation.dart';
 import '../../../constants/function/pick_function.dart';
-import '../../../controls/spending_firebase.dart';
+import '../../../controls/spending_repository.dart';
 import '../../../models/user.dart' as myuser;
 import 'package:shimmer/shimmer.dart';
 
@@ -42,7 +42,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         centerTitle: true,
       ),
       body: FutureBuilder(
-        future: SpendingFirebase.getUser(),
+        future: SpendingRepository.getUser(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             myuser.User user = snapshot.requireData;
@@ -160,7 +160,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 ),
                                 onPressed: () async {
                                   loadingAnimation(context);
-                                  await SpendingFirebase.updateInfo(
+                                  await SpendingRepository.updateInfo(
                                     user: user.copyWith(
                                       name: nameController.text.trim(),
                                       money: int.parse(moneyController.text

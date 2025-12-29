@@ -9,7 +9,7 @@ import 'package:expense_tracker/constants/function/loading_animation.dart';
 import 'package:expense_tracker/constants/function/pick_function.dart';
 import 'package:expense_tracker/constants/function/route_function.dart';
 import 'package:expense_tracker/constants/list.dart';
-import 'package:expense_tracker/controls/spending_firebase.dart';
+import 'package:expense_tracker/controls/spending_repository.dart';
 import 'package:expense_tracker/models/spending.dart';
 import 'package:expense_tracker/page/add_spending/choose_type.dart';
 import 'package:expense_tracker/page/add_spending/widget/add_friend.dart';
@@ -316,7 +316,7 @@ class _AddSpendingPageState extends State<AddSpendingPage> {
         friends: friends,
       );
       loadingAnimation(context);
-      await SpendingFirebase.addSpending(spending);
+      await SpendingRepository.addSpending(spending);
       if (!mounted) return;
       Navigator.pop(context);
       Navigator.pop(context);

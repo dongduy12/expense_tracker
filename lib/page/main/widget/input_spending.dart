@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:expense_tracker/constants/function/list_categories.dart';
-import 'package:expense_tracker/controls/spending_firebase.dart';
+import 'package:expense_tracker/controls/spending_repository.dart';
 import 'package:expense_tracker/models/spending.dart';
 import 'package:expense_tracker/setting/localization/app_localizations.dart';
 
@@ -287,7 +287,7 @@ class _InputSpendingState extends State<InputSpending> {
                 ),
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    await SpendingFirebase.addSpending(
+                    await SpendingRepository.addSpending(
                       Spending(
                         money: (-1) *
                             int.parse(_moneyController.text

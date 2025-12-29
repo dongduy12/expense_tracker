@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:expense_tracker/constants/app_colors.dart';
-import 'package:expense_tracker/controls/spending_firebase.dart';
+import 'package:expense_tracker/controls/spending_repository.dart';
 import 'package:expense_tracker/page/lock/app_lock_page.dart';
 import 'package:expense_tracker/page/main/home/home_page.dart';
 import 'package:expense_tracker/page/main/main_page.dart';
@@ -18,7 +18,7 @@ bool appLockEnabled = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SpendingFirebase.init();
+  await SpendingRepository.init();
   final prefs = await SharedPreferences.getInstance();
   language = prefs.getInt('language');
   isDark = prefs.getBool("isDark") ?? false;
