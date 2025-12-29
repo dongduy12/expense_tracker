@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:expense_tracker/page/view_spending/view_image.dart';
 
 import '../../constants/function/loading_animation.dart';

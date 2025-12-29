@@ -142,7 +142,7 @@
   "currency_exchange_rate": "Currency Exchange Rate",
   "search_by_country_name_or_currency": "Search by country name or currency",
   "check_your_email_make_password_change!": "Please check your email and make a new password change!",
-  "you_have_spending_the_day":"You don't have any spending\non the day",
+  "you_have_spending_the_day": "You don't have any spending\non the day",
   "please_select_type": "Please select type!",
   "please_enter_valid_amount": "Please enter a valid amount!",
   "nothing_here": "Nothing here!",
@@ -221,8 +221,7 @@
   "sep": "Sep",
   "oct": "Oct",
   "nov": "Nov",
-  "dec": "Dec"
-}
+  "dec": "Dec",
   "cloud_backup": "Cloud backup",
   "connect_google_drive": "Connect Google Drive",
   "drive_connected": "Google Drive connected",
@@ -246,3 +245,9 @@
   "notifications_disabled": "Notifications disabled",
   "stay_informed": "Stay informed about your activity",
   "more": "More",
+  "create_app_password": "Create app password",
+  "enter_app_password": "Enter app password",
+  "passwords_do_not_match": "Password do not match",
+  "password_too_short": "Password too short",
+  "continue": "Continue"
+}

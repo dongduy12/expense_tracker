@@ -221,8 +221,7 @@
   "sep": "TH 9",
   "oct": "TH 10",
   "nov": "TH 11",
-  "dec": "TH 12"
-}
+  "dec": "TH 12",
   "cloud_backup": "Sao lưu đám mây",
   "connect_google_drive": "Kết nối Google Drive",
   "drive_connected": "Đã kết nối Google Drive",
@@ -246,3 +245,9 @@
   "notifications_disabled": "Đã tắt thông báo",
   "stay_informed": "Luôn nhận cập nhật về hoạt động của bạn",
   "more": "Khác",
+  "create_app_password": "Tạo mật khẩu ứng dụng",
+  "enter_app_password": "Nhập mật khẩu ứng dụng",
+  "passwords_do_not_match": "Mật khẩu không khớp",
+  "password_too_short": "Mật khẩu quá ngắn (tối thiểu 4 ký tự)",
+  "continue": "Tiếp tục"
+}
