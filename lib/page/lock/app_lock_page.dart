@@ -31,13 +31,21 @@ class _AppLockPageState extends State<AppLockPage> {
     final prefs = await SharedPreferences.getInstance();
     final stored = prefs.getString('app_password');
 
-    if (stored == null && !widget.setup) {
+    // --- SỬA Ở ĐÂY: CƠ CHẾ TỰ ĐỘNG SỬA LỖI ---
+    // Nếu đang ở màn hình Đăng nhập (!widget.setup) mà không tìm thấy mật khẩu (stored == null)
+    if (!widget.setup && stored == null) {
+      // Tự động tắt tính năng khóa để người dùng vào được app
+      await prefs.setBool('app_lock_enabled', false);
+
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/setup-lock');
+      // Chuyển thẳng vào màn hình chính
+      Navigator.pushReplacementNamed(context, '/main');
       return;
     }
+    // ----------------------------------------
 
-    if (widget.setup || stored == null) {
+    // Logic tạo mật khẩu mới (chỉ chạy khi widget.setup = true)
+    if (widget.setup) {
       if (_passwordController.text != _confirmController.text) {
         setState(() => _error = AppLocalizations.of(context)
             .translate('passwords_do_not_match'));
@@ -48,7 +56,9 @@ class _AppLockPageState extends State<AppLockPage> {
       await prefs.setBool('firstStart', false);
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/main');
-    } else {
+    }
+    // Logic đăng nhập (chỉ chạy khi có mật khẩu stored)
+    else {
       if (_passwordController.text == stored) {
         await prefs.setBool('firstStart', false);
         if (!mounted) return;
@@ -59,7 +69,6 @@ class _AppLockPageState extends State<AppLockPage> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
