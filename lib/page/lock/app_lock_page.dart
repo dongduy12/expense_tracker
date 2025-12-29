@@ -18,6 +18,15 @@ class _AppLockPageState extends State<AppLockPage> {
   final TextEditingController _confirmController = TextEditingController();
   bool _obscure = true;
   String? _error;
+  bool _prefsLoaded = false;
+  String? _storedPassword;
+  bool _enforceUnlockFlow = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStoredPassword();
+  }
 
   @override
   void dispose() {
@@ -26,10 +35,26 @@ class _AppLockPageState extends State<AppLockPage> {
     super.dispose();
   }
 
+  Future<void> _loadStoredPassword() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _storedPassword = prefs.getString('app_password');
+      _prefsLoaded = true;
+      _enforceUnlockFlow = widget.setup && _storedPassword != null;
+    });
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final prefs = await SharedPreferences.getInstance();
     final stored = prefs.getString('app_password');
+    setState(() {
+      _storedPassword = stored;
+      _prefsLoaded = true;
+      _enforceUnlockFlow = widget.setup && stored != null;
+    });
+    final isSetupFlow = widget.setup && !_enforceUnlockFlow;
 
     // --- SỬA Ở ĐÂY: CƠ CHẾ TỰ ĐỘNG SỬA LỖI ---
     // Nếu đang ở màn hình Đăng nhập (!widget.setup) mà không tìm thấy mật khẩu (stored == null)
@@ -45,7 +70,7 @@ class _AppLockPageState extends State<AppLockPage> {
     // ----------------------------------------
 
     // Logic tạo mật khẩu mới (chỉ chạy khi widget.setup = true)
-    if (widget.setup) {
+    if (isSetupFlow) {
       if (_passwordController.text != _confirmController.text) {
         setState(() => _error = AppLocalizations.of(context)
             .translate('passwords_do_not_match'));
@@ -61,6 +86,7 @@ class _AppLockPageState extends State<AppLockPage> {
     else {
       if (_passwordController.text == stored) {
         await prefs.setBool('firstStart', false);
+        await prefs.setBool('app_lock_enabled', true);
         if (!mounted) return;
         Navigator.pushReplacementNamed(context, '/main');
       } else {
@@ -69,6 +95,7 @@ class _AppLockPageState extends State<AppLockPage> {
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,7 +113,7 @@ class _AppLockPageState extends State<AppLockPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    widget.setup
+                    widget.setup && !_enforceUnlockFlow
                         ? AppLocalizations.of(context)
                             .translate('create_app_password')
                         : AppLocalizations.of(context)
@@ -123,9 +150,10 @@ class _AppLockPageState extends State<AppLockPage> {
                       return null;
                     },
                   ),
-                  if (widget.setup || _confirmController.text.isNotEmpty)
+                  if ((widget.setup && !_enforceUnlockFlow) ||
+                      _confirmController.text.isNotEmpty)
                     const SizedBox(height: 20),
-                  if (widget.setup)
+                  if (widget.setup && !_enforceUnlockFlow)
                     TextFormField(
                       controller: _confirmController,
                       obscureText: _obscure,
@@ -160,16 +188,17 @@ class _AppLockPageState extends State<AppLockPage> {
                     ),
                   ),
                   if (!widget.setup)
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(
-                            context, '/setup-lock');
-                      },
-                      child: Text(
-                        AppLocalizations.of(context)
-                            .translate('create_app_password'),
+                    if (_prefsLoaded && _storedPassword == null)
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(
+                              context, '/setup-lock');
+                        },
+                        child: Text(
+                          AppLocalizations.of(context)
+                              .translate('create_app_password'),
+                        ),
                       ),
-                    ),
                 ],
               ),
             ),
