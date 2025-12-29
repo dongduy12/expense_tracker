@@ -522,7 +522,7 @@ class _SettingPageState extends State<SettingPage> {
     if (directory == null) return null;
 
     String path =
-        "${directory.path}/TNT_${DateFormat("dd_MM_yyyy_HH_mm_ss").format(DateTime.now())}.csv";
+        '${directory.path}/TNT_${DateFormat('dd_MM_yyyy_HH_mm_ss').format(DateTime.now())}.csv';
     File f = File(path);
     await f.writeAsString(csv);
     return path;
