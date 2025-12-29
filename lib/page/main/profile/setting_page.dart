@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../constants/function/route_function.dart';
 import '../../../constants/list.dart';
-import '../../../controls/spending_firebase.dart';
+import '../../../controls/spending_repository.dart';
 import '../../../models/spending.dart';
 import '../../../models/user.dart' as myuser;
 import '../../../setting/bloc/setting_cubit.dart';
@@ -73,7 +73,7 @@ class _SettingPageState extends State<SettingPage> {
       ),
       body: SafeArea(
         child: ValueListenableBuilder<myuser.User?>(
-          valueListenable: SpendingFirebase.userNotifier,
+          valueListenable: SpendingRepository.userNotifier,
           builder: (_, user, __) {
             return RefreshIndicator(
               onRefresh: _loadPreferences,
@@ -480,7 +480,7 @@ class _SettingPageState extends State<SettingPage> {
 
   Future<String?> _exportCSV(AppLocalizations localization) async {
     List<Spending> spendingList =
-        List<Spending>.from(SpendingFirebase.spendingNotifier.value);
+        List<Spending>.from(SpendingRepository.spendingNotifier.value);
     List<List<dynamic>> rows = [];
 
     rows.add([

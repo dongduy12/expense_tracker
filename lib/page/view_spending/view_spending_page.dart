@@ -11,7 +11,7 @@ import 'package:expense_tracker/page/view_spending/view_image.dart';
 import '../../constants/function/loading_animation.dart';
 import '../../constants/function/route_function.dart';
 import '../../constants/list.dart';
-import '../../controls/spending_firebase.dart';
+import '../../controls/spending_repository.dart';
 import '../../models/spending.dart';
 import '../../setting/localization/app_localizations.dart';
 import '../add_spending/widget/circle_text.dart';
@@ -339,7 +339,7 @@ class _ViewSpendingPageState extends State<ViewSpendingPage> {
                   ),
                   onPressed: () async {
                     loadingAnimation(context);
-                    await SpendingFirebase.deleteSpending(spending);
+                    await SpendingRepository.deleteSpending(spending);
                     if (widget.delete != null) {
                       widget.delete!(spending.id!);
                     }

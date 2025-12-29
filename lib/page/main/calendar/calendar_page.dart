@@ -1,5 +1,5 @@
 import 'package:expense_tracker/constants/function/find_index.dart';
-import 'package:expense_tracker/controls/spending_firebase.dart';
+import 'package:expense_tracker/controls/spending_repository.dart';
 import 'package:expense_tracker/models/spending.dart';
 import 'package:expense_tracker/page/main/calendar/widget/build_spending.dart';
 import 'package:expense_tracker/page/main/calendar/widget/custom_table_calendar.dart';
@@ -26,7 +26,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return Scaffold(
       body: SafeArea(
         child: ValueListenableBuilder<List<Spending>>(
-            valueListenable: SpendingFirebase.spendingNotifier,
+            valueListenable: SpendingRepository.spendingNotifier,
             builder: (context, dataSpending, _) {
               return StatefulBuilder(builder: (context, setState) {
                 final spendingForMonth = dataSpending

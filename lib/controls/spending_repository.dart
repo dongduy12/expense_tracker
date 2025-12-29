@@ -80,10 +80,10 @@ class LocalDatabase {
   }
 }
 
-class SpendingFirebase {
-  SpendingFirebase._();
+class SpendingRepository {
+  SpendingRepository._();
 
-  static final SpendingFirebase instance = SpendingFirebase._();
+  static final SpendingRepository instance = SpendingRepository._();
   static final spendingNotifier = ValueNotifier<List<Spending>>([]);
   static final userNotifier = ValueNotifier<myuser.User?>(null);
 

@@ -1,6 +1,6 @@
 import 'package:expense_tracker/constants/function/get_date.dart';
 import 'package:expense_tracker/constants/function/route_function.dart';
-import 'package:expense_tracker/controls/spending_firebase.dart';
+import 'package:expense_tracker/controls/spending_repository.dart';
 import 'package:expense_tracker/models/spending.dart';
 import 'package:expense_tracker/page/main/analytic/chart/column_chart.dart';
 import 'package:expense_tracker/page/main/analytic/chart/pie_chart.dart';
@@ -161,7 +161,7 @@ class _AnalyticPageState extends State<AnalyticPage>
 
   Widget body() {
     return ValueListenableBuilder<List<Spending>>(
-      valueListenable: SpendingFirebase.spendingNotifier,
+      valueListenable: SpendingRepository.spendingNotifier,
       builder: (context, spendingData, _) {
         List<Spending> spendingList =
             spendingData.where((element) => checkDate(element.dateTime)).toList();
