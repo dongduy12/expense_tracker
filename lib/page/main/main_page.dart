@@ -8,7 +8,7 @@ import 'package:expense_tracker/page/add_spending/add_spending.dart';
 import 'package:expense_tracker/page/main/analytic/analytic_page.dart';
 import 'package:expense_tracker/page/main/calendar/calendar_page.dart';
 import 'package:expense_tracker/page/main/home/home_page.dart';
-import 'package:expense_tracker/page/main/profile/profile_page.dart';
+import 'package:expense_tracker/page/main/profile/setting_page.dart';
 import 'package:expense_tracker/page/main/widget/item_bottom_tab.dart';
 
 import '../../setting/localization/app_localizations.dart';
@@ -26,7 +26,7 @@ class _MainPageState extends State<MainPage> {
     const HomePage(),
     const CalendarPage(),
     const AnalyticPage(),
-    const ProfilePage()
+    const SettingPage()
   ];
 
   DateTime? currentBackPressTime;
@@ -110,12 +110,12 @@ class _MainPageState extends State<MainPage> {
                     },
                   ),
                   itemBottomTab(
-                    text: AppLocalizations.of(context).translate('account'),
+                    text: AppLocalizations.of(context).translate('setting'),
                     index: 3,
                     current: currentTab,
                     icon: currentTab == 3
-                        ? FontAwesomeIcons.userLarge
-                        : FontAwesomeIcons.user,
+                        ? FontAwesomeIcons.solidCircleUser
+                        : FontAwesomeIcons.gear,
                     action: () {
                       setState(() => currentTab = 3);
                     },
