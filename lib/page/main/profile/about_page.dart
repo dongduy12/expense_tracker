@@ -37,7 +37,7 @@ class AboutPage extends StatelessWidget {
           const SizedBox(height: 20),
           InkWell(
             onTap: () async {
-              var url = 'https://fb.com/ngoctien.TNT';
+              var url = 'https://fb.com/...';
               if (await canLaunchUrlString(url)) {
                 await launchUrlString(
                   url,
@@ -66,7 +66,7 @@ class AboutPage extends StatelessWidget {
           const SizedBox(height: 20),
           InkWell(
             onTap: () async {
-              var url = 'https://twitter.com/ngoctienTNT';
+              var url = 'https://twitter.com/...';
               if (await canLaunchUrlString(url)) {
                 await launchUrlString(
                   url,
@@ -101,7 +101,7 @@ class AboutPage extends StatelessWidget {
           const SizedBox(height: 20),
           InkWell(
             onTap: () async {
-              var url = 'https://t.me/ngoctienTNT';
+              var url = 'https://t.me/...';
               if (await canLaunchUrlString(url)) {
                 await launchUrlString(
                   url,
@@ -130,9 +130,9 @@ class AboutPage extends StatelessWidget {
           const SizedBox(height: 20),
           InkWell(
             onTap: () async {
-              String email = 'ngoctienTNT.vn@gmail.com';
+              String email = 'dongduy261299@gmail.com';
               String subject = 'Spending Manager';
-              String body = 'Hello Tran Ngoc Tien';
+              String body = 'Hello Duy';
 
               String emailUrl = "mailto:$email?subject=$subject&body=$body";
 
@@ -167,7 +167,7 @@ class AboutPage extends StatelessWidget {
           const Spacer(),
           InkWell(
             onTap: () async {
-              var url = 'https://me.momo.vn/ngoctienTNT';
+              var url = 'https://me.momo.vn/...';
               if (await canLaunchUrlString(url)) {
                 await launchUrlString(
                   url,
