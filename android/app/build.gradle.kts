@@ -5,6 +5,16 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// --- THÊM ĐOẠN NÀY (Bắt đầu) ---
+import java.util.Properties
+        import java.io.FileInputStream
+
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+// --- THÊM ĐOẠN NÀY (Kết thúc) ---
 android {
     namespace = "com.fxvn.expense_tracker"
     compileSdk = flutter.compileSdkVersion
@@ -30,11 +40,27 @@ android {
         versionName = flutter.versionName
     }
 
+    // --- THÊM ĐOẠN SIGNING CONFIGS NÀY ---
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            storeFile = file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
+        }
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            //signingConfig = signingConfigs.getByName("debug")
+            // Đã đổi từ "debug" sang "release"
+            signingConfig = signingConfigs.getByName("release")
+            // Giúp tối ưu và thu nhỏ code (tùy chọn, nên bật cho bản thật)
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 }
