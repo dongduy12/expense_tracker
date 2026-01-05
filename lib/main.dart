@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:expense_tracker/constants/app_colors.dart';
@@ -57,6 +58,9 @@ class MyApp extends StatelessWidget {
                   ? ThemeData(
                       brightness: Brightness.dark,
                       primarySwatch: Colors.blue,
+                      appBarTheme: const AppBarTheme(
+                        systemOverlayStyle: SystemUiOverlayStyle.light,
+                      ),
                     )
                   : ThemeData(
                       cardColor: Colors.white,
@@ -79,6 +83,11 @@ class MyApp extends StatelessWidget {
                           color: Colors.black,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
+                        ),
+                        systemOverlayStyle: SystemUiOverlayStyle(
+                          statusBarColor: Colors.white,
+                          statusBarIconBrightness: Brightness.dark,
+                          statusBarBrightness: Brightness.light,
                         ),
                       ),
                       primaryColor: Colors.white,
