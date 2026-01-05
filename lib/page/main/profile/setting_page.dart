@@ -7,7 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../constants/function/route_function.dart';
@@ -35,9 +37,11 @@ class _SettingPageState extends State<SettingPage> {
   bool lockEnabled = false;
   bool driveConnected = false;
   bool driveConnecting = false;
+  bool driveUploading = false;
   bool notificationsEnabled = true;
   bool backupInProgress = false;
   DateTime? lastBackup;
+  String? lastBackupPath;
 
   final numberFormat = NumberFormat.currency(locale: "vi_VI");
 
@@ -58,6 +62,7 @@ class _SettingPageState extends State<SettingPage> {
       driveConnected = prefs.getBool("drive_connected") ?? false;
       notificationsEnabled = prefs.getBool("push_notifications") ?? true;
       final backupRaw = prefs.getString('drive_last_backup');
+      lastBackupPath = prefs.getString('drive_last_backup_path');
       if (backupRaw != null) {
         lastBackup = DateTime.tryParse(backupRaw);
       }
@@ -227,6 +232,16 @@ class _SettingPageState extends State<SettingPage> {
               color: Theme.of(context).textTheme.bodySmall?.color,
             ),
           ),
+          if (lastBackupPath != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              p.basename(lastBackupPath!),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(fontStyle: FontStyle.italic),
+            ),
+          ],
         ],
         const SizedBox(height: 12),
         SizedBox(
@@ -237,6 +252,23 @@ class _SettingPageState extends State<SettingPage> {
             onPressed: backupInProgress
                 ? null
                 : () => _startBackup(localization),
+          ),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            icon: driveUploading
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.drive_folder_upload_outlined),
+            label: Text(localization.translate('upload_backup_drive')),
+            onPressed: driveUploading || backupInProgress
+                ? null
+                : () => _uploadBackupToDrive(localization),
           ),
         ),
       ],
@@ -400,8 +432,12 @@ class _SettingPageState extends State<SettingPage> {
       final prefs = await SharedPreferences.getInstance();
       final now = DateTime.now();
       await prefs.setString('drive_last_backup', now.toIso8601String());
+      await prefs.setString('drive_last_backup_path', path);
       if (!mounted) return;
-      setState(() => lastBackup = now);
+      setState(() {
+        lastBackup = now;
+        lastBackupPath = path;
+      });
       Fluttertoast.showToast(
         msg:
             "${localization.translate('backup_ready_for_drive')}\n$path",
@@ -410,6 +446,40 @@ class _SettingPageState extends State<SettingPage> {
     } finally {
       if (mounted) {
         setState(() => backupInProgress = false);
+      }
+    }
+  }
+
+  Future<void> _uploadBackupToDrive(AppLocalizations localization) async {
+    if (!driveConnected) {
+      Fluttertoast.showToast(
+        msg: localization.translate('connect_drive_first'),
+      );
+      return;
+    }
+    if (lastBackupPath == null) {
+      Fluttertoast.showToast(
+        msg: localization.translate('no_backup_yet'),
+      );
+      return;
+    }
+    final file = File(lastBackupPath!);
+    if (!file.existsSync()) {
+      Fluttertoast.showToast(
+        msg: localization.translate('backup_missing'),
+      );
+      return;
+    }
+
+    setState(() => driveUploading = true);
+    try {
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: localization.translate('backup_ready_for_drive'),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => driveUploading = false);
       }
     }
   }

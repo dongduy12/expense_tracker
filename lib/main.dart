@@ -64,24 +64,24 @@ class MyApp extends StatelessWidget {
                           const ColorScheme.light(background: Colors.white),
                       brightness: Brightness.light,
                       primarySwatch: Colors.blue,
-                      scaffoldBackgroundColor: AppColors.whisperBackground,
-                      bottomAppBarTheme: BottomAppBarThemeData(
-                        color: AppColors.whisperBackground,
+                      scaffoldBackgroundColor: Colors.white,
+                      bottomAppBarTheme: const BottomAppBarTheme(
+                        color: Colors.white,
                       ),
                       floatingActionButtonTheme:
                           const FloatingActionButtonThemeData(
                         backgroundColor: Color.fromRGBO(121, 158, 84, 1),
                       ),
-                      appBarTheme: AppBarTheme(
-                        backgroundColor: AppColors.whisperBackground,
-                        iconTheme: const IconThemeData(color: Colors.black),
-                        titleTextStyle: const TextStyle(
+                      appBarTheme: const AppBarTheme(
+                        backgroundColor: Colors.white,
+                        iconTheme: IconThemeData(color: Colors.black),
+                        titleTextStyle: TextStyle(
                           color: Colors.black,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      primaryColor: const Color.fromRGBO(242, 243, 247, 1),
+                      primaryColor: Colors.white,
                     ),
               initialRoute: isFirstStart
                   ? "/"
