@@ -46,7 +46,7 @@ class _MainPageState extends State<MainPage> {
           child: screens[currentTab],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.small(
         onPressed: () {
           Navigator.of(context).push(
             createRoute(screen: const AddSpendingPage()),
