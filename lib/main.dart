@@ -43,67 +43,95 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: BlocBuilder<SettingCubit, SettingState>(
-          buildWhen: (previous, current) => previous != current,
-          builder: (_, settingState) {
-            return MaterialApp(
-              supportedLocales: AppLocalizationsSetup.supportedLocales,
-              localizationsDelegates:
-                  AppLocalizationsSetup.localizationsDelegates,
-              localeResolutionCallback:
-                  AppLocalizationsSetup.localeResolutionCallback,
-              locale: settingState.locale,
-              debugShowCheckedModeBanner: false,
-              title: 'Spending Management',
-              theme: settingState.isDark
-                  ? ThemeData(
-                      brightness: Brightness.dark,
-                      primarySwatch: Colors.blue,
-                      appBarTheme: const AppBarTheme(
-                        systemOverlayStyle: SystemUiOverlayStyle.light,
-                      ),
-                    )
-                  : ThemeData(
-                      cardColor: Colors.white,
-                      colorScheme:
-                          const ColorScheme.light(background: Colors.white),
-                      brightness: Brightness.light,
-                      primarySwatch: Colors.blue,
-                      scaffoldBackgroundColor: Colors.white,
-                      bottomAppBarTheme: const BottomAppBarTheme(
-                        color: Colors.white,
-                      ),
-                      floatingActionButtonTheme:
-                          const FloatingActionButtonThemeData(
-                        backgroundColor: Color.fromRGBO(121, 158, 84, 1),
-                      ),
-                      appBarTheme: const AppBarTheme(
-                        backgroundColor: Colors.white,
-                        iconTheme: IconThemeData(color: Colors.black),
-                        titleTextStyle: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        systemOverlayStyle: SystemUiOverlayStyle(
-                          statusBarColor: Colors.white,
-                          statusBarIconBrightness: Brightness.dark,
-                          statusBarBrightness: Brightness.light,
-                        ),
-                      ),
-                      primaryColor: Colors.white,
-                    ),
-              initialRoute: isFirstStart
-                  ? "/"
-                  : (appLockEnabled ? "/unlock" : "/main"),
-              routes: {
-                '/': (context) => const OnBoardingPage(),
-                '/unlock': (context) => const AppLockPage(),
-                '/setup-lock': (context) => const AppLockPage(setup: true),
-                '/home': (context) => const HomePage(),
-                '/main': (context) => const MainPage(),
-              },
-            );
-          }),
+        buildWhen: (previous, current) => previous != current,
+        builder: (_, settingState) {
+          final ThemeData lightTheme = ThemeData(
+            cardColor: Colors.white,
+            colorScheme: const ColorScheme.light(background: Colors.white),
+            brightness: Brightness.light,
+            primarySwatch: Colors.blue,
+            scaffoldBackgroundColor: Colors.white,
+            bottomAppBarTheme: const BottomAppBarThemeData(
+              color: Colors.white,
+            ),
+            floatingActionButtonTheme: const FloatingActionButtonThemeData(
+              backgroundColor: Color.fromRGBO(121, 158, 84, 1),
+            ),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.white,
+              iconTheme: IconThemeData(color: Colors.black),
+              titleTextStyle: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: Colors.white,
+                statusBarIconBrightness: Brightness.dark,
+                statusBarBrightness: Brightness.light,
+              ),
+            ),
+            primaryColor: Colors.white,
+          );
+
+          final ThemeData darkTheme = ThemeData(
+            brightness: Brightness.dark,
+            primarySwatch: Colors.blue,
+            scaffoldBackgroundColor: const Color(0xFF121212),
+            colorScheme:
+                const ColorScheme.dark(background: Color(0xFF121212)),
+            bottomAppBarTheme: const BottomAppBarThemeData(
+              color: Color(0xFF121212),
+            ),
+            floatingActionButtonTheme: const FloatingActionButtonThemeData(
+              backgroundColor: Color.fromRGBO(121, 158, 84, 1),
+            ),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF121212),
+              systemOverlayStyle: SystemUiOverlayStyle.light,
+            ),
+          );
+
+          final theme = settingState.isDark ? darkTheme : lightTheme;
+
+          SystemChrome.setSystemUIOverlayStyle(
+            SystemUiOverlayStyle(
+              statusBarColor: theme.scaffoldBackgroundColor,
+              statusBarIconBrightness: settingState.isDark
+                  ? Brightness.light
+                  : Brightness.dark,
+              statusBarBrightness: settingState.isDark
+                  ? Brightness.dark
+                  : Brightness.light,
+              systemNavigationBarColor: theme.scaffoldBackgroundColor,
+              systemNavigationBarIconBrightness: settingState.isDark
+                  ? Brightness.light
+                  : Brightness.dark,
+            ),
+          );
+
+          return MaterialApp(
+            supportedLocales: AppLocalizationsSetup.supportedLocales,
+            localizationsDelegates:
+                AppLocalizationsSetup.localizationsDelegates,
+            localeResolutionCallback:
+                AppLocalizationsSetup.localeResolutionCallback,
+            locale: settingState.locale,
+            debugShowCheckedModeBanner: false,
+            title: 'Spending Management',
+            theme: theme,
+            initialRoute:
+                isFirstStart ? "/" : (appLockEnabled ? "/unlock" : "/main"),
+            routes: {
+              '/': (context) => const OnBoardingPage(),
+              '/unlock': (context) => const AppLockPage(),
+              '/setup-lock': (context) => const AppLockPage(setup: true),
+              '/home': (context) => const HomePage(),
+              '/main': (context) => const MainPage(),
+            },
+          );
+        },
+      ),
     );
   }
 }

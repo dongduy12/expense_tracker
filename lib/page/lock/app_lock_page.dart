@@ -93,108 +93,119 @@ class _AppLockPageState extends State<AppLockPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: WillPopScope(
         onWillPop: () => onWillPop(
           action: (_) {},
           currentBackPressTime: null,
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    widget.setup
-                        ? AppLocalizations.of(context)
-                            .translate('create_app_password')
-                        : AppLocalizations.of(context)
-                            .translate('enter_app_password'),
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 30),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: _obscure,
-                    decoration: InputDecoration(
-                      labelText:
-                          AppLocalizations.of(context).translate('password'),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                            _obscure ? Icons.visibility : Icons.visibility_off),
-                        onPressed: () =>
-                            setState(() => _obscure = !_obscure),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return AppLocalizations.of(context)
-                            .translate('please_enter_valid_amount');
-                      }
-                      if (value.length < 4) {
-                        return AppLocalizations.of(context)
-                            .translate('password_too_short');
-                      }
-                      return null;
-                    },
-                  ),
-                  if (widget.setup || _confirmController.text.isNotEmpty)
-                    const SizedBox(height: 20),
-                  if (widget.setup)
-                    TextFormField(
-                      controller: _confirmController,
-                      obscureText: _obscure,
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)
-                            .translate('confirm_password'),
-                      ),
-                      validator: (value) {
-                        if (widget.setup &&
-                            (value == null || value.isEmpty)) {
-                          return AppLocalizations.of(context)
-                              .translate('please_enter_valid_amount');
-                        }
-                        return null;
-                      },
-                    ),
-                  if (_error != null) ...[
-                    const SizedBox(height: 10),
-                    Text(
-                      _error!,
-                      style: const TextStyle(color: Colors.red),
-                    )
-                  ],
-                  const SizedBox(height: 30),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _submit,
-                      child: Text(
-                        AppLocalizations.of(context).translate('continue'),
-                      ),
-                    ),
-                  ),
-                  if (!widget.setup)
-                    if (_prefsLoaded && _storedPassword == null)
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(
-                              context, '/setup-lock');
-                        },
-                        child: Text(
-                          AppLocalizations.of(context)
-                              .translate('create_app_password'),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          widget.setup
+                              ? AppLocalizations.of(context)
+                                  .translate('create_app_password')
+                              : AppLocalizations.of(context)
+                                  .translate('enter_app_password'),
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                ],
-              ),
-            ),
+                        const SizedBox(height: 30),
+                        TextFormField(
+                          controller: _passwordController,
+                          obscureText: _obscure,
+                          decoration: InputDecoration(
+                            labelText: AppLocalizations.of(context)
+                                .translate('password'),
+                            suffixIcon: IconButton(
+                              icon: Icon(_obscure
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: () =>
+                                  setState(() => _obscure = !_obscure),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return AppLocalizations.of(context)
+                                  .translate('please_enter_valid_amount');
+                            }
+                            if (value.length < 4) {
+                              return AppLocalizations.of(context)
+                                  .translate('password_too_short');
+                            }
+                            return null;
+                          },
+                        ),
+                        if (widget.setup || _confirmController.text.isNotEmpty)
+                          const SizedBox(height: 20),
+                        if (widget.setup)
+                          TextFormField(
+                            controller: _confirmController,
+                            obscureText: _obscure,
+                            decoration: InputDecoration(
+                              labelText: AppLocalizations.of(context)
+                                  .translate('confirm_password'),
+                            ),
+                            validator: (value) {
+                              if (widget.setup &&
+                                  (value == null || value.isEmpty)) {
+                                return AppLocalizations.of(context)
+                                    .translate('please_enter_valid_amount');
+                              }
+                              return null;
+                            },
+                          ),
+                        if (_error != null) ...[
+                          const SizedBox(height: 10),
+                          Text(
+                            _error!,
+                            style: const TextStyle(color: Colors.red),
+                          )
+                        ],
+                        const SizedBox(height: 30),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _submit,
+                            child: Text(
+                              AppLocalizations.of(context)
+                                  .translate('continue'),
+                            ),
+                          ),
+                        ),
+                        if (!widget.setup)
+                          if (_prefsLoaded && _storedPassword == null)
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushReplacementNamed(
+                                    context, '/setup-lock');
+                              },
+                              child: Text(
+                                AppLocalizations.of(context)
+                                    .translate('create_app_password'),
+                              ),
+                            ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),
