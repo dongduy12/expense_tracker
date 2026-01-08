@@ -23,6 +23,7 @@ import '../profile/about_page.dart';
 import '../profile/currency_exchange_rate.dart';
 import '../profile/edit_profile_page.dart';
 import '../profile/history_page.dart';
+import '../chatbot/gemini_chat_page.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -381,6 +382,20 @@ class _SettingPageState extends State<SettingPage> {
             Navigator.of(context).push(
               createRoute(
                 screen: const AboutPage(),
+                begin: const Offset(1, 0),
+              ),
+            );
+          },
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.smart_toy_outlined),
+          title: Text(localization.translate('gemini_assistant')),
+          subtitle: Text(localization.translate('gemini_assistant_description')),
+          onTap: () {
+            Navigator.of(context).push(
+              createRoute(
+                screen: const GeminiChatPage(),
                 begin: const Offset(1, 0),
               ),
             );
