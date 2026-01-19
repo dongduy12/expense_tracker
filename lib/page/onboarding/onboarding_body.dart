@@ -25,15 +25,13 @@ class ItemOnBoarding extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           const Spacer(),
-          Container(
-            decoration:
-                BoxDecoration(border: Border.all(color: Colors.black54)),
-            child: Image.asset(
-              item["image"]!,
-              fit: BoxFit.fitHeight,
-              height: MediaQuery.of(context).size.height - 300,
-            ),
+          Image.asset(
+            item["image"]!,
+            fit: BoxFit.fitHeight,
+            // Giữ nguyên chiều cao để ảnh hiển thị cân đối
+            height: MediaQuery.of(context).size.height - 300,
           ),
+          // -------------------
           const Spacer(),
         ],
       ),

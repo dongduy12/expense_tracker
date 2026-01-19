@@ -20,40 +20,25 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   DateTime? currentBackPressTime;
   List<Map<String, String>> listPage = [
     {
-      "image": "assets/intro/home.jpg",
+      "image": "assets/intro/one.png",
       "title": "home",
       "content": "view_monthly_spending_summary_and_remaining_balance"
     },
     {
-      "image": "assets/intro/calendar.jpg",
+      "image": "assets/intro/two.png",
       "title": "calendar",
       "content": "review_your_scheduled_expenses"
     },
     {
-      "image": "assets/intro/add.jpg",
-      "title": "add_spending",
-      "content": "add_and_edit_your_daily_spending"
-    },
-    {
-      "image": "assets/intro/share.jpg",
+      "image": "assets/intro/three.png",
       "title": "share",
       "content": "share_your_spending_with_friends"
     },
     {
-      "image": "assets/intro/search.jpg",
-      "title": "search",
+      "image": "assets/intro/four.png",
+      "title": "revenue_expenditure",
       "content": "search_for_your_expenses"
-    },
-    {
-      "image": "assets/intro/analytic.jpg",
-      "title": "statistical",
-      "content": "view_your_spending_and_income_reports_through_graphs"
-    },
-    {
-      "image": "assets/intro/profile.jpg",
-      "title": "account",
-      "content": "edit_personal_information_and_other_settings"
-    },
+    }
   ];
 
   @override
@@ -77,7 +62,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
               controller: controller,
               itemCount: listPage.length,
               onPageChanged: (value) {
-                setState(() => isLastPage = value == 6);
+                setState(() => isLastPage = value == 3);
               },
               itemBuilder: (context, index) => ItemOnBoarding(
                 item: listPage[index],
@@ -124,7 +109,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                   Center(
                     child: SmoothPageIndicator(
                       controller: controller,
-                      count: 7,
+                      count: 4,
                       effect: WormEffect(
                         spacing: 10,
                         dotWidth: 10,
