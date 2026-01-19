@@ -11,7 +11,6 @@ import 'package:expense_tracker/page/main/calendar/calendar_page.dart';
 import 'package:expense_tracker/page/main/chatbot/gemini_chat_page.dart';
 import 'package:expense_tracker/page/main/home/home_page.dart';
 import 'package:expense_tracker/page/main/profile/setting_page.dart';
-// import 'package:expense_tracker/page/main/widget/item_bottom_tab.dart'; // Không cần dùng widget cũ này nữa
 
 import '../../setting/localization/app_localizations.dart';
 
@@ -59,7 +58,7 @@ class _MainPageState extends State<MainPage> {
           // Nút Gemini Chat (Vẫn giữ vị trí cũ hoặc chỉnh bottom cao hơn xíu để tránh menu)
           Positioned(
             right: 16,
-            bottom: 100, // Nâng lên một chút để không bị che bởi menu mới
+            bottom: 30, // Nâng lên một chút để không bị che bởi menu mới
             child: _buildGeminiChatButton(context),
           ),
         ],
@@ -177,7 +176,7 @@ class _MainPageState extends State<MainPage> {
               height: 52,
               width: 52,
               child: Icon(
-                Icons.smart_toy_rounded,
+                Icons.auto_awesome_rounded,
                 color: Colors.white,
               ),
             ),
