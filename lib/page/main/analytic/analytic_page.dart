@@ -1,23 +1,14 @@
-import 'package:expense_tracker/constants/function/get_date.dart';
-import 'package:expense_tracker/constants/function/route_function.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+// Import Repository để lấy dữ liệu offline
 import 'package:expense_tracker/controls/spending_repository.dart';
 import 'package:expense_tracker/models/spending.dart';
-import 'package:expense_tracker/page/main/analytic/chart/column_chart.dart';
-import 'package:expense_tracker/page/main/analytic/chart/pie_chart.dart';
-import 'package:expense_tracker/page/main/analytic/search_page.dart';
-import 'package:expense_tracker/page/main/analytic/widget/custom_tabbar.dart';
-import 'package:expense_tracker/page/main/analytic/widget/show_date.dart';
-import 'package:expense_tracker/page/main/analytic/widget/show_list_spending_column.dart';
-import 'package:expense_tracker/page/main/analytic/widget/show_list_spending_pie.dart';
-import 'package:expense_tracker/page/main/analytic/widget/tabbar_chart.dart';
-import 'package:expense_tracker/page/main/analytic/widget/tabbar_type.dart';
-import 'package:expense_tracker/page/main/analytic/widget/total_report.dart';
-import 'package:expense_tracker/setting/localization/app_localizations.dart';
-import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:expense_tracker/constants/function/extension.dart';
+import '../../../constants/app_styles.dart';
+import '../../../setting/localization/app_localizations.dart';
 
-import '../../../constants/function/get_data_spending.dart';
+// Import widget Bento Grid (Đảm bảo bạn đã tạo file này theo hướng dẫn trước)
+import 'analytic_bento_view.dart';
 
 class AnalyticPage extends StatefulWidget {
   const AnalyticPage({Key? key}) : super(key: key);
@@ -26,248 +17,159 @@ class AnalyticPage extends StatefulWidget {
   State<AnalyticPage> createState() => _AnalyticPageState();
 }
 
-class _AnalyticPageState extends State<AnalyticPage>
-    with TickerProviderStateMixin {
-  late TabController _tabController;
-  late TabController _chartController;
+class _AnalyticPageState extends State<AnalyticPage> with TickerProviderStateMixin {
+  // Controller cho danh sách tháng (19 tháng)
+  late TabController _monthController;
+  // Controller cho loại giao dịch (Chi tiêu / Thu nhập)
   late TabController _typeController;
-  bool chart = false;
-  DateTime now = DateTime.now();
-  String date = "";
+
+  List<DateTime> months = [];
 
   @override
   void initState() {
-    date = getWeek(now);
-    _tabController = TabController(length: 3, vsync: this);
-    _chartController = TabController(length: 2, vsync: this);
-    _typeController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() {
-      now = DateTime.now();
-      setState(() {
-        if (_tabController.index == 0) {
-          date = getWeek(now);
-        } else if (_tabController.index == 1) {
-          date = getMonth(now);
-        } else {
-          date = getYear(now);
-        }
-      });
-    });
-    _chartController.addListener(() {
-      setState(() {
-        if (_chartController.index == 0) {
-          chart = false;
-        } else {
-          chart = true;
-        }
-      });
-    });
-    _typeController.addListener(() => setState(() {}));
     super.initState();
+
+    // 1. Khởi tạo Controller cho 2 Tab: Chi tiêu & Thu nhập
+    _typeController = TabController(length: 2, vsync: this);
+
+    // 2. Khởi tạo Controller cho 19 tháng (Quá khứ -> Tương lai)
+    _monthController = TabController(length: 19, vsync: this);
+    _monthController.index = 17; // Mặc định chọn tháng hiện tại (index 17)
+
+    // Lắng nghe sự kiện vuốt tháng để reload lại giao diện
+    _monthController.addListener(() {
+      if (_monthController.indexIsChanging) return;
+      setState(() {});
+    });
+
+    // 3. Tạo dữ liệu danh sách tháng
+    DateTime now = DateTime(DateTime.now().year, DateTime.now().month);
+    // Tháng sau (Future)
+    months = [DateTime(now.year, now.month + 1), now];
+    // 17 tháng trước (Past)
+    for (int i = 1; i < 19; i++) {
+      now = DateTime(now.year, now.month - 1);
+      months.add(now);
+    }
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
-    _chartController.dispose();
+    _monthController.dispose();
     _typeController.dispose();
     super.dispose();
-  }
-
-  bool checkDate(DateTime date) {
-    if (_tabController.index == 0) {
-      int weekDay = now.weekday;
-      DateTime firstDayOfWeek = DateTime(now.year, now.month, now.day)
-          .subtract(Duration(days: weekDay - 1));
-
-      DateTime lastDayOfWeek = firstDayOfWeek.add(const Duration(days: 6));
-
-      if (firstDayOfWeek.isBefore(date) && lastDayOfWeek.isAfter(date) ||
-          isSameDay(firstDayOfWeek, date) ||
-          isSameDay(lastDayOfWeek, date)) return true;
-    } else if (_tabController.index == 1 && isSameMonth(date, now)) {
-      return true;
-    } else if (_tabController.index == 2 && date.year == now.year) {
-      return true;
-    }
-    return false;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            header(),
-            const SizedBox(height: 20),
-            Expanded(child: body()),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget header() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              const Text(
-                "Spending",
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-              ),
-              const Spacer(),
-              InkWell(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onTap: () {
-                  Navigator.of(context).push(
-                    createRoute(
-                      screen: const SearchPage(),
-                      begin: const Offset(1, 0),
-                    ),
-                  );
-                },
-                child: Material(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(90),
-                  ),
-                  elevation: 1,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(90),
-                    ),
-                    child: const Icon(
-                      FontAwesomeIcons.magnifyingGlass,
-                      size: 20,
-                      color: Color.fromRGBO(180, 190, 190, 1),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+      backgroundColor: const Color(0xFFF5F7FA), // Màu nền xám nhạt hiện đại (Soft UI)
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        centerTitle: true,
+        title: Text(
+          AppLocalizations.of(context).translate('analytic'),
+          style: const TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.w700,
+              fontSize: 20
           ),
-          const SizedBox(height: 20),
-          CustomTabBar(controller: _tabController),
-        ],
-      ),
-    );
-  }
-
-  Widget body() {
-    return ValueListenableBuilder<List<Spending>>(
-      valueListenable: SpendingRepository.spendingNotifier,
-      builder: (context, spendingData, _) {
-        List<Spending> spendingList =
-            spendingData.where((element) => checkDate(element.dateTime)).toList();
-
-        List<Spending> classifySpending = spendingList.where((element) {
-          if (_typeController.index == 0 && element.money > 0) {
-            return false;
-          }
-          if (_typeController.index == 1 && element.money < 0) {
-            return false;
-          }
-          return true;
-        }).toList();
-
-        return SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              children: [
-                showChart(classifySpending),
-                if (spendingList.isNotEmpty) TotalReport(list: spendingList),
-                if (spendingList.isNotEmpty)
-                  (chart
-                      ? showListSpendingPie(list: classifySpending)
-                      : ShowListSpendingColumn(
-                          spendingList: classifySpending,
-                          index: _tabController.index))
+        ),
+        // TabBar chọn Chi tiêu / Thu nhập nằm dưới AppBar
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Container(
+            color: Colors.white,
+            child: TabBar(
+              controller: _typeController,
+              labelColor: const Color(0xFF4A00E0), // Màu tím/xanh đậm khi chọn
+              unselectedLabelColor: Colors.grey,
+              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              indicatorColor: const Color(0xFF4A00E0),
+              indicatorWeight: 3,
+              tabs: [
+                Tab(text: AppLocalizations.of(context).translate('expense')),
+                Tab(text: AppLocalizations.of(context).translate('income')),
               ],
             ),
           ),
-        );
-      },
-    );
-  }
-
-  Widget showChart(List<Spending> classifySpending) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-      color: const Color(0xff2c4260),
-      child: Column(
+        ),
+      ),
+      body: Column(
         children: [
-          const SizedBox(height: 10),
-          showDate(
-            date: date,
-            index: _tabController.index,
-            now: now,
-            action: (date, now) {
-              setState(() {
-                this.date = date;
-                this.now = now;
-              });
-            },
-          ),
-          TabBarType(controller: _typeController),
-          classifySpending.isNotEmpty
-              ? (chart
-                  ? MyPieChart(list: classifySpending)
-                  : ColumnChart(
-                      index: _tabController.index,
-                      list: classifySpending,
-                      dateTime: now,
-                    ))
-              : SizedBox(
-                  height: 350,
-                  child: Center(
+          // --- PHẦN 1: THANH CHỌN THÁNG (Month Selector) ---
+          Container(
+            height: 60,
+            color: Colors.white,
+            child: TabBar(
+              controller: _monthController,
+              isScrollable: true,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.grey,
+              // Trang trí nút tháng được chọn (Hình viên thuốc màu xanh)
+              indicator: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF4A00E0), Color(0xFF8E2DE2)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF4A00E0).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    )
+                  ]
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+              tabs: List.generate(19, (index) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Tab(
                     child: Text(
-                      AppLocalizations.of(context).translate('no_data'),
-                      style: const TextStyle(
-                        color: Color.fromRGBO(255, 224, 111, 1),
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      index == 17
+                          ? AppLocalizations.of(context).translate('this_month').capitalize()
+                          : (index == 18
+                          ? AppLocalizations.of(context).translate('next_month').capitalize()
+                          : DateFormat("MM/yyyy").format(months[18 - index])),
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ),
-                ),
-          tabBarChart(controller: _chartController),
-          const SizedBox(height: 10),
-        ],
-      ),
-    );
-  }
+                );
+              }),
+            ),
+          ),
 
-  Widget loading() {
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        color: const Color(0xff2c4260),
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-            showDate(
-              date: date,
-              index: 0,
-              now: now,
-              action: (date, now) {},
+          // --- PHẦN 2: NỘI DUNG CHÍNH (Bento Grid) ---
+          Expanded(
+            // Lắng nghe dữ liệu từ SQLite (SpendingRepository)
+            child: ValueListenableBuilder<List<Spending>>(
+              valueListenable: SpendingRepository.spendingNotifier,
+              builder: (context, fullList, _) {
+
+                // 1. Lọc danh sách theo tháng đang chọn
+                final selectedMonth = months[18 - _monthController.index];
+                final monthList = fullList.where((element) {
+                  return element.dateTime.month == selectedMonth.month &&
+                      element.dateTime.year == selectedMonth.year;
+                }).toList();
+
+                // 2. Hiển thị Grid theo 2 tab (Chi tiêu / Thu nhập)
+                return TabBarView(
+                  controller: _typeController,
+                  children: [
+                    // Tab 1: Chi tiêu (isIncome = false)
+                    AnalyticBentoView(list: monthList, isIncome: false),
+
+                    // Tab 2: Thu nhập (isIncome = true)
+                    AnalyticBentoView(list: monthList, isIncome: true),
+                  ],
+                );
+              },
             ),
-            TabBarType(controller: TabController(length: 2, vsync: this)),
-            const SizedBox(
-              height: 350,
-              child: Center(child: CircularProgressIndicator()),
-            ),
-            tabBarChart(controller: TabController(length: 2, vsync: this)),
-            const SizedBox(height: 10),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

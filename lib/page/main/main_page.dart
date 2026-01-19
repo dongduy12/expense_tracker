@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_nav_bar/google_nav_bar.dart'; // Import thư viện mới
 import 'package:image_picker/image_picker.dart';
 import 'package:expense_tracker/constants/function/on_will_pop.dart';
 import 'package:expense_tracker/constants/function/route_function.dart';
@@ -10,7 +11,7 @@ import 'package:expense_tracker/page/main/calendar/calendar_page.dart';
 import 'package:expense_tracker/page/main/chatbot/gemini_chat_page.dart';
 import 'package:expense_tracker/page/main/home/home_page.dart';
 import 'package:expense_tracker/page/main/profile/setting_page.dart';
-import 'package:expense_tracker/page/main/widget/item_bottom_tab.dart';
+// import 'package:expense_tracker/page/main/widget/item_bottom_tab.dart'; // Không cần dùng widget cũ này nữa
 
 import '../../setting/localization/app_localizations.dart';
 
@@ -23,6 +24,8 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int currentTab = 0;
+
+  // Danh sách màn hình giữ nguyên như code của bạn
   List<Widget> screens = [
     const HomePage(),
     const CalendarPage(),
@@ -37,6 +40,9 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Màu nền xám nhẹ để làm nổi bật thanh menu trắng
+      backgroundColor: const Color(0xFFF5F7FA),
+
       body: Stack(
         children: [
           WillPopScope(
@@ -49,96 +55,95 @@ class _MainPageState extends State<MainPage> {
               child: screens[currentTab],
             ),
           ),
+
+          // Nút Gemini Chat (Vẫn giữ vị trí cũ hoặc chỉnh bottom cao hơn xíu để tránh menu)
           Positioned(
             right: 16,
-            bottom: 90,
+            bottom: 100, // Nâng lên một chút để không bị che bởi menu mới
             child: _buildGeminiChatButton(context),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.small(
+
+      // Nút Thêm Chi Tiêu (Floating Button)
+      floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(
             createRoute(screen: const AddSpendingPage()),
           );
         },
-        child: Icon(
+        backgroundColor: const Color(0xFF4A00E0), // Màu tím hiện đại (hoặc màu primary của bạn)
+        elevation: 8,
+        shape: const CircleBorder(), // Bo tròn hoàn toàn
+        child: const Icon(
           Icons.add_rounded,
-          color: Theme.of(context).colorScheme.background,
+          color: Colors.white,
+          size: 30,
         ),
       ),
+      // Đặt nút Add ở giữa dock
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        // color: AppColors.whisperBackground,
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 10,
-        child: SizedBox(
-          height: 60,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  itemBottomTab(
-                    text: AppLocalizations.of(context).translate('home'),
-                    index: 0,
-                    current: currentTab,
-                    icon: FontAwesomeIcons.house,
-                    action: () {
-                      setState(() {
-                        currentTab = 0;
-                      });
-                    },
-                  ),
-                  itemBottomTab(
-                    text: AppLocalizations.of(context).translate('calendar'),
-                    index: 1,
-                    current: currentTab,
-                    size: 28,
-                    icon: Icons.calendar_month_outlined,
-                    action: () {
-                      setState(() {
-                        currentTab = 1;
-                      });
-                    },
-                  ),
-                ],
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  itemBottomTab(
-                    text: AppLocalizations.of(context).translate('analytic'),
-                    index: 2,
-                    current: currentTab,
-                    icon: FontAwesomeIcons.chartPie,
-                    action: () {
-                      setState(() {
-                        currentTab = 2;
-                      });
-                    },
-                  ),
-                  itemBottomTab(
-                    text: AppLocalizations.of(context).translate('setting'),
-                    index: 3,
-                    current: currentTab,
-                    icon: currentTab == 3
-                        ? FontAwesomeIcons.solidCircleUser
-                        : FontAwesomeIcons.gear,
-                    action: () {
-                      setState(() => currentTab = 3);
-                    },
-                  ),
-                ],
+
+      // --- PHẦN MENU HIỆN ĐẠI MỚI ---
+      bottomNavigationBar: Container(
+        color: Colors.transparent, // Nền trong suốt
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20), // Cách lề dưới và 2 bên
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24), // Bo góc "viên thuốc"
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1), // Bóng mờ nhẹ
+                blurRadius: 20,
+                offset: const Offset(0, 10),
               ),
             ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: GNav(
+              gap: 8, // Khoảng cách giữa icon và chữ
+              activeColor: Colors.white, // Màu icon khi được chọn
+              iconSize: 24,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              duration: const Duration(milliseconds: 400), // Thời gian hiệu ứng trượt
+              tabBackgroundColor: const Color(0xFF4A00E0), // Màu nền tím khi chọn tab
+              color: Colors.grey[500], // Màu icon khi chưa chọn
+
+              tabs: [
+                GButton(
+                  icon: FontAwesomeIcons.house,
+                  text: AppLocalizations.of(context).translate('home'),
+                ),
+                GButton(
+                  icon: Icons.calendar_month_outlined,
+                  text: AppLocalizations.of(context).translate('calendar'),
+                ),
+                GButton(
+                  icon: FontAwesomeIcons.chartPie,
+                  text: AppLocalizations.of(context).translate('analytic'),
+                ),
+                GButton(
+                  // Logic icon Setting/User giữ nguyên như ý bạn
+                  icon: currentTab == 3 ? FontAwesomeIcons.solidCircleUser : FontAwesomeIcons.gear,
+                  text: AppLocalizations.of(context).translate('setting'),
+                ),
+              ],
+              selectedIndex: currentTab,
+              onTabChange: (index) {
+                setState(() {
+                  currentTab = index;
+                });
+              },
+            ),
           ),
         ),
       ),
     );
   }
 
+  // Widget Gemini giữ nguyên (chỉ sửa lại style một chút cho đồng bộ nếu cần)
   Widget _buildGeminiChatButton(BuildContext context) {
     return Tooltip(
       message: AppLocalizations.of(context).translate('gemini_assistant'),
@@ -162,8 +167,8 @@ class _MainPageState extends State<MainPage> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.18),
-                  blurRadius: 10,
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
               ],

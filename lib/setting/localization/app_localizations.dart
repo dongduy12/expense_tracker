@@ -26,7 +26,10 @@ class AppLocalizations {
     });
   }
 
-  String translate(String key) => _localizedStrings[key] as String;
-
+  // Tìm hàm translate cũ (thường ở khoảng dòng 28-30) và thay bằng:
+  String translate(String key) {
+    // Nếu tìm thấy key thì trả về giá trị, nếu không thấy (null) thì trả về chính cái key đó
+    return _localizedStrings[key] ?? key;
+  }
   bool get isEnLocale => locale.languageCode == 'en';
 }

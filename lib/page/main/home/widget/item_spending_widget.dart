@@ -10,89 +10,87 @@ import '../../../../setting/localization/app_localizations.dart';
 import '../view_list_spending_page.dart';
 
 class ItemSpendingWidget extends StatelessWidget {
-  const ItemSpendingWidget({Key? key, this.spendingList}) : super(key: key);
-  final List<Spending>? spendingList;
+  final Spending spending;
+
+  const ItemSpendingWidget({Key? key, required this.spending}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return spendingList != null
-        ? ListView.builder(
-            // shrinkWrap: true,
-            // physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(10),
-            itemCount: listType.length,
-            itemBuilder: (context, index) {
-              if ([0, 10, 21, 27, 35, 38].contains(index)) {
-                return const SizedBox.shrink();
-              } else {
-                var list = spendingList!
-                    .where((element) => element.type == index)
-                    .toList();
-                if (list.isNotEmpty) {
-                  return body(context, index, list);
-                } else {
-                  return const SizedBox.shrink();
-                }
-              }
-            },
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.08),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.all(10),
+          // SỬA LỖI: Kiểm tra ID hợp lệ trong danh sách
+          child: spending.type == 41
+              ? const Icon(Icons.attach_money, color: Colors.green)
+              : (spending.type >= 0 && spending.type < listType.length && listType[spending.type]['image'] != null
+              ? Image.asset(
+            listType[spending.type]['image']!,
+            fit: BoxFit.contain,
           )
-        : loadingItemSpending();
-  }
-
-  Widget body(BuildContext context, int index, List<Spending> list) {
-    var numberFormat = NumberFormat.currency(locale: "vi_VI");
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(15),
-      onTap: () {
-        Navigator.of(context).push(createRoute(
-          screen: ViewListSpendingPage(spendingList: list),
-          begin: const Offset(1, 0),
-        ));
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
+              : const Icon(Icons.help_outline)),
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-          child: Row(
-            children: [
-              Image.asset(listType[index]["image"]!, width: 40),
-              const SizedBox(width: 10),
-              Container(
-                constraints: const BoxConstraints(maxWidth: 100),
-                child: Text(
-                  AppLocalizations.of(context)
-                      .translate(listType[index]["title"]!),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+        title: Text(
+          spending.type == 41
+              ? (spending.typeName ?? AppLocalizations.of(context).translate('income'))
+          // SỬA LỖI: Lấy title an toàn
+              : (spending.type >= 0 && spending.type < listType.length
+              ? AppLocalizations.of(context).translate(listType[spending.type]['title']!)
+              : "Unknown"),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // SỬA LỖI: Kiểm tra null cho note
+            if (spending.note != null && spending.note!.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                spending.note!, // Dùng dấu ! vì đã check null ở trên
+                style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              Expanded(
-                child: Text(
-                  numberFormat.format(list
-                      .map((e) => e.money)
-                      .reduce((value, element) => value + element)),
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.end,
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ),
-              const SizedBox(width: 10),
-              const Icon(Icons.arrow_forward_ios_outlined)
             ],
+            const SizedBox(height: 4),
+            Text(
+              DateFormat("dd/MM/yyyy - HH:mm").format(spending.dateTime),
+              style: TextStyle(color: Colors.grey[400], fontSize: 11),
+            ),
+          ],
+        ),
+        trailing: Text(
+          NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(spending.money),
+          style: TextStyle(
+            color: spending.type == 41 ? Colors.green : Colors.redAccent,
+            fontWeight: FontWeight.w700,
+            fontSize: 15,
           ),
         ),
       ),
     );
   }
 }
-
 Widget loadingItemSpending() {
   return ListView.builder(
     shrinkWrap: true,
